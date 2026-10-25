@@ -1,0 +1,1741 @@
+{
+ "riddle": [
+  [
+   {
+    "q": "Blanca por dentro, verde por fuera. Si quieres que te lo diga, espera.",
+    "a": "La pera"
+   },
+   {
+    "q": "Oro parece, plata no es. ¿Qué es?",
+    "a": "El plátano",
+    "alt": [
+     "banana",
+     "platano"
+    ]
+   },
+   {
+    "q": "Orejas largas, cola cortita, salto y salto y como zanahorias.",
+    "a": "El conejo"
+   },
+   {
+    "q": "Redonda como un queso, nadie me puede dar un beso. Salgo de noche.",
+    "a": "La luna"
+   },
+   {
+    "q": "Tengo cuatro patas y no puedo andar, tengo cabecera y no sé hablar.",
+    "a": "La cama",
+    "alt": [
+     "cama"
+    ]
+   },
+   {
+    "q": "Tengo un vestido blanco y amarillo el corazón. Si me caigo, me rompo.",
+    "a": "El huevo"
+   },
+   {
+    "q": "Agua pasa por mi casa, cate de mi corazón.",
+    "a": "El aguacate",
+    "alt": [
+     "aguacate"
+    ]
+   },
+   {
+    "q": "Tengo hojas y no soy árbol, tengo lomo y no soy caballo.",
+    "a": "El libro",
+    "alt": [
+     "libro"
+    ]
+   }
+  ],
+  [
+   {
+    "q": "Tengo agujas y no sé coser, tengo números y no sé leer.",
+    "a": "El reloj"
+   },
+   {
+    "q": "Llevo mi casa a cuestas y dejo un caminito de plata.",
+    "a": "El caracol"
+   },
+   {
+    "q": "Sube llena y baja vacía; si no se da prisa, la sopa se enfría.",
+    "a": "La cuchara"
+   },
+   {
+    "q": "Tiene dientes y no come, tiene cabeza y no es hombre.",
+    "a": "El ajo"
+   },
+   {
+    "q": "Una señorita muy aseñorada, siempre va en coche y siempre va mojada.",
+    "a": "La lengua"
+   },
+   {
+    "q": "Lleva años en el mar y todavía no sabe nadar.",
+    "a": "La arena"
+   },
+   {
+    "q": "En el campo me crié, atada con verdes lazos; quien llora por mí me está partiendo en pedazos.",
+    "a": "La cebolla"
+   },
+   {
+    "q": "Una vieja con un solo diente que llama a toda la gente.",
+    "a": "La campana"
+   }
+  ],
+  [
+   {
+    "q": "Cuanto más le quitas, más grande se hace.",
+    "a": "Un agujero",
+    "alt": [
+     "hoyo",
+     "pozo",
+     "agujero"
+    ]
+   },
+   {
+    "q": "Basta con decir mi nombre para que desaparezca.",
+    "a": "El silencio"
+   },
+   {
+    "q": "Tengo ciudades pero no casas, ríos pero no agua y montañas pero no piedras.",
+    "a": "Un mapa"
+   },
+   {
+    "q": "Me puedes oír, pero no ver; solo repito lo que dices.",
+    "a": "El eco"
+   },
+   {
+    "q": "Tengo cama y no duermo, tengo boca y no hablo, corro y no tengo pies.",
+    "a": "El río",
+    "e": "El cauce es su cama y la desembocadura, su boca."
+   },
+   {
+    "q": "Siempre está llegando, pero nunca llega.",
+    "a": "Mañana",
+    "e": "Cuando llega, ya se llama hoy."
+   },
+   {
+    "q": "Si me tienes, quieres contarme. Si me cuentas, ya no me tienes.",
+    "a": "Un secreto"
+   },
+   {
+    "q": "Se rompe sin tocarla, solo con no cumplirla.",
+    "a": "Una promesa"
+   },
+   {
+    "q": "Vuela sin alas y llora sin ojos.",
+    "a": "La nube",
+    "alt": [
+     "nubes"
+    ]
+   },
+   {
+    "q": "Tengo teclas pero no soy piano, tengo ratón pero no soy gato.",
+    "a": "El ordenador",
+    "alt": [
+     "computadora",
+     "portátil",
+     "computador"
+    ]
+   },
+   {
+    "q": "Cuanto más grande es, menos se ve.",
+    "a": "La oscuridad",
+    "alt": [
+     "oscuridad"
+    ]
+   },
+   {
+    "q": "Tengo ojos y no veo, tengo agua y no la bebo, tengo carne y no la como, tengo barba y no soy hombre.",
+    "a": "El coco"
+   }
+  ],
+  [
+   {
+    "q": "El pobre la tiene, el rico la necesita, y si la comes, te mueres.",
+    "a": "Nada"
+   },
+   {
+    "q": "Llena una habitación entera sin ocupar ningún espacio.",
+    "a": "La luz"
+   },
+   {
+    "q": "Si me das de comer, vivo. Si me das de beber, muero.",
+    "a": "El fuego"
+   },
+   {
+    "q": "Tengo raíces que nadie ve, soy más alta que los árboles, subo y subo y nunca crezco.",
+    "a": "La montaña",
+    "alt": [
+     "monte"
+    ]
+   },
+   {
+    "q": "Cuantos más das, más dejas atrás.",
+    "a": "Los pasos",
+    "alt": [
+     "paso",
+     "pasos"
+    ]
+   },
+   {
+    "q": "Es tuyo, pero los demás lo usan mucho más que tú.",
+    "a": "Tu nombre",
+    "alt": [
+     "nombre",
+     "mi nombre",
+     "el nombre"
+    ]
+   },
+   {
+    "q": "Lo tiras cuando lo necesitas y lo recoges cuando ya no te hace falta.",
+    "a": "El ancla"
+   },
+   {
+    "q": "Cuanto más lo compartes, más tienes. Cuanto más lo guardas, menos vale.",
+    "a": "El conocimiento",
+    "alt": [
+     "saber",
+     "sabiduría"
+    ]
+   }
+  ]
+ ],
+ "logic": [
+  [
+   {
+    "q": "¿Qué pesa más, un kilo de plumas o un kilo de piedras?",
+    "a": "Pesan lo mismo",
+    "o": [
+     "Las piedras",
+     "Las plumas",
+     "Depende del tamaño"
+    ],
+    "e": "Los dos pesan un kilo."
+   },
+   {
+    "q": "¿Cuántas patas tienen en total dos perros y un pájaro?",
+    "a": "10 patas",
+    "e": "4 + 4 + 2 = 10."
+   },
+   {
+    "q": "¿Qué número sigue? 2, 4, 6, 8…",
+    "a": "10",
+    "e": "Se suma 2 cada vez."
+   },
+   {
+    "q": "¿Quién tiene más patas, una araña o un gato?",
+    "a": "La araña",
+    "o": [
+     "El gato",
+     "Tienen las mismas",
+     "Ninguno de los dos"
+    ],
+    "e": "La araña tiene 8 patas y el gato 4."
+   },
+   {
+    "q": "Si tienes 3 manzanas y te comes 1, ¿cuántas manzanas te has comido?",
+    "a": "1 manzana",
+    "o": [
+     "2 manzanas",
+     "3 manzanas",
+     "Ninguna"
+    ],
+    "e": "¡La pregunta era cuántas te has comido!"
+   },
+   {
+    "q": "¿De qué color es el caballo blanco de Santiago?",
+    "a": "Blanco",
+    "o": [
+     "Negro",
+     "Marrón",
+     "Gris"
+    ]
+   }
+  ],
+  [
+   {
+    "q": "El padre de Ana tiene tres hijas: Lala, Lele y… ¿cómo se llama la tercera?",
+    "a": "Ana",
+    "o": [
+     "Lili",
+     "Lolo",
+     "Lulú"
+    ]
+   },
+   {
+    "q": "Si ayer fue lunes, ¿qué día será mañana?",
+    "a": "Miércoles",
+    "o": [
+     "Martes",
+     "Jueves",
+     "Domingo"
+    ],
+    "e": "Hoy es martes."
+   },
+   {
+    "q": "Un gallo pone un huevo en lo alto del tejado. ¿Hacia qué lado cae?",
+    "a": "Hacia ninguno",
+    "o": [
+     "Hacia la derecha",
+     "Hacia la izquierda",
+     "Hacia el centro"
+    ],
+    "e": "Los gallos no ponen huevos."
+   },
+   {
+    "q": "¿Qué número sigue? 1, 1, 2, 3, 5, 8…",
+    "a": "13",
+    "e": "Cada número es la suma de los dos anteriores."
+   },
+   {
+    "q": "En una carrera adelantas al que va segundo. ¿En qué puesto vas ahora?",
+    "a": "Segundo",
+    "o": [
+     "Primero",
+     "Tercero",
+     "Último"
+    ],
+    "e": "Ocupas su lugar."
+   },
+   {
+    "q": "¿Cuántos meses del año tienen 28 días?",
+    "a": "Todos",
+    "o": [
+     "Uno",
+     "Dos",
+     "Seis"
+    ],
+    "e": "Todos los meses llegan al día 28."
+   },
+   {
+    "q": "Dos padres y dos hijos van a pescar y pescan 3 peces, uno cada uno. ¿Cómo es posible?",
+    "a": "Son tres personas",
+    "o": [
+     "Uno no pescó",
+     "Pescaron cuatro peces",
+     "Es imposible"
+    ],
+    "e": "Un abuelo, su hijo y su nieto: dos son padres y dos son hijos."
+   }
+  ],
+  [
+   {
+    "q": "Un ladrillo pesa 1 kilo más medio ladrillo. ¿Cuánto pesa el ladrillo?",
+    "a": "2 kilos",
+    "e": "Si medio ladrillo pesa 1 kilo, el ladrillo entero pesa 2."
+   },
+   {
+    "q": "Un caracol está en el fondo de un pozo de 10 metros. Cada día sube 3 metros y cada noche resbala 2. ¿Cuántos días tarda en salir?",
+    "a": "8 días",
+    "e": "En 7 días llega a 7 metros; el octavo sube 3 y sale."
+   },
+   {
+    "q": "Si 5 máquinas hacen 5 piezas en 5 minutos, ¿cuánto tardan 100 máquinas en hacer 100 piezas?",
+    "a": "5 minutos",
+    "o": [
+     "100 minutos",
+     "20 minutos",
+     "1 minuto"
+    ],
+    "e": "Cada máquina hace una pieza en 5 minutos."
+   },
+   {
+    "q": "Un bate y una pelota cuestan 1,10 €. El bate cuesta 1 € más que la pelota. ¿Cuánto cuesta la pelota?",
+    "a": "5 céntimos",
+    "o": [
+     "10 céntimos",
+     "1 €",
+     "15 céntimos"
+    ],
+    "e": "Pelota 0,05 € y bate 1,05 €. Si la pelota costara 10 céntimos, el bate costaría 1,10 € y el total sería 1,20 €."
+   },
+   {
+    "q": "Un nenúfar dobla su tamaño cada día y tarda 30 días en cubrir todo el lago. ¿Qué día cubría la mitad?",
+    "a": "El día 29",
+    "o": [
+     "El día 15",
+     "El día 28",
+     "El día 1"
+    ],
+    "e": "Al día siguiente se dobla y cubre el lago entero."
+   },
+   {
+    "q": "En un cajón a oscuras hay 10 calcetines negros y 10 blancos. ¿Cuántos tienes que sacar para estar seguro de tener una pareja del mismo color?",
+    "a": "3 calcetines",
+    "o": [
+     "2 calcetines",
+     "11 calcetines",
+     "20 calcetines"
+    ],
+    "e": "Con 2 pueden salir distintos; el tercero coincide seguro con uno de ellos."
+   },
+   {
+    "q": "El médico te da 3 pastillas y te dice que tomes una cada media hora. ¿Cuánto tardas en tomarlas todas?",
+    "a": "1 hora",
+    "o": [
+     "1 hora y media",
+     "2 horas",
+     "Media hora"
+    ],
+    "e": "Una ahora, otra a la media hora y la última a la hora."
+   },
+   {
+    "q": "Una familia tiene 4 hijas y cada hija tiene un hermano. ¿Cuántos hijos hay en total?",
+    "a": "5 hijos",
+    "o": [
+     "8 hijos",
+     "4 hijos",
+     "9 hijos"
+    ],
+    "e": "Todas comparten el mismo hermano."
+   },
+   {
+    "q": "¿Qué letra sigue? U, D, T, C, C, S, S, O…",
+    "a": "N",
+    "o": [
+     "D",
+     "O",
+     "Z"
+    ],
+    "e": "Son las iniciales de uno, dos, tres… ocho, nueve."
+   },
+   {
+    "q": "¿Qué número sigue? 2, 3, 5, 7, 11, 13…",
+    "a": "17",
+    "e": "Son los números primos: solo se dividen entre 1 y entre sí mismos."
+   },
+   {
+    "q": "Cuando yo tenía 6 años, mi hermana tenía la mitad de mi edad. Ahora tengo 40. ¿Cuántos años tiene ella?",
+    "a": "37 años",
+    "o": [
+     "20 años",
+     "34 años",
+     "43 años"
+    ],
+    "e": "Siempre se llevan 3 años."
+   },
+   {
+    "q": "Un pastor debe cruzar un río con un lobo, una cabra y una col. En la barca solo cabe uno con él. Si los deja solos, el lobo se come la cabra y la cabra se come la col. ¿Cómo lo hace?",
+    "a": "Cabra, lobo, cabra de vuelta, col, cabra",
+    "o": [
+     "Lobo, cabra y col, sin volver",
+     "Col, cabra y lobo, sin volver",
+     "Es imposible"
+    ],
+    "e": "Cruza la cabra. Vuelve y cruza el lobo, pero regresa con la cabra. Cruza la col. Vuelve a por la cabra."
+   },
+   {
+    "q": "Un tren eléctrico va hacia el norte y el viento sopla hacia el sur. ¿Hacia dónde va el humo?",
+    "a": "No hay humo",
+    "o": [
+     "Hacia el norte",
+     "Hacia el sur",
+     "Hacia arriba"
+    ],
+    "e": "Los trenes eléctricos no echan humo."
+   }
+  ],
+  [
+   {
+    "q": "Tienes un reloj de arena de 7 minutos y otro de 11. ¿Cómo mides exactamente 15 minutos?",
+    "a": "Dando la vuelta al de 7 dos veces",
+    "o": [
+     "Dando la vuelta al de 11 dos veces",
+     "Usando solo el de 11",
+     "Es imposible con esos relojes"
+    ],
+    "e": "Empiezas los dos. A los 7 minutos das la vuelta al de 7. A los 11 se acaba el grande y el de 7 lleva 4 minutos: le das la vuelta y tarda 4 más. 11 + 4 = 15."
+   },
+   {
+    "q": "Fuera de una habitación cerrada hay 3 interruptores; uno enciende la bombilla de dentro. Solo puedes entrar una vez. ¿Cómo sabes cuál es?",
+    "a": "Usando el calor de la bombilla",
+    "o": [
+     "Probando al azar",
+     "Encendiendo los tres a la vez",
+     "Es imposible"
+    ],
+    "e": "Enciendes el primero unos minutos y lo apagas, enciendes el segundo y entras. Encendida: el segundo. Apagada y caliente: el primero. Apagada y fría: el tercero."
+   },
+   {
+    "q": "¿Qué número sigue? 1, 11, 21, 1211, 111221…",
+    "a": "312211",
+    "o": [
+     "1112221",
+     "2221111",
+     "111222111"
+    ],
+    "e": "Cada número describe el anterior: 111221 es «tres unos, dos doses, un uno»."
+   },
+   {
+    "q": "Tienes 9 monedas iguales, pero una pesa un poco más. Con una balanza de dos platos, ¿cuántas pesadas necesitas como mínimo para encontrarla?",
+    "a": "2 pesadas",
+    "o": [
+     "3 pesadas",
+     "4 pesadas",
+     "1 pesada"
+    ],
+    "e": "Comparas 3 contra 3. Sabes en qué grupo de 3 está. Después comparas 1 contra 1."
+   },
+   {
+    "q": "Si una gallina y media pone un huevo y medio en un día y medio, ¿cuántos huevos pone una gallina en 3 días?",
+    "a": "2 huevos",
+    "o": [
+     "1 huevo",
+     "3 huevos",
+     "4 huevos"
+    ],
+    "e": "Una gallina pone un huevo en un día y medio."
+   },
+   {
+    "q": "Un hombre mira un retrato y dice: «No tengo hermanos, pero el padre de ese hombre es el hijo de mi padre». ¿Quién está en el retrato?",
+    "a": "Su hijo",
+    "o": [
+     "Él mismo",
+     "Su padre",
+     "Su hermano"
+    ],
+    "e": "«El hijo de mi padre» es él mismo."
+   },
+   {
+    "q": "¿Cuántos cuadrados de cualquier tamaño hay en un tablero de ajedrez de 8 × 8?",
+    "a": "204",
+    "o": [
+     "64",
+     "65",
+     "144"
+    ],
+    "e": "64 + 49 + 36 + 25 + 16 + 9 + 4 + 1 = 204."
+   },
+   {
+    "q": "Tienes dos cuerdas que tardan una hora en arder, pero de forma irregular. ¿Cómo mides 45 minutos?",
+    "a": "Encendiendo una por los dos extremos",
+    "o": [
+     "Cortando una cuerda por la mitad",
+     "Encendiendo las dos por un extremo",
+     "Es imposible"
+    ],
+    "e": "Enciendes la primera por los dos lados y la segunda por uno. A los 30 minutos se acaba la primera: enciendes el otro extremo de la segunda, que tarda 15 minutos más."
+   },
+   {
+    "q": "Dos puertas, una lleva al tesoro. Cada una tiene un guardián: uno siempre miente y otro siempre dice la verdad, pero no sabes cuál es cuál. Puedes hacer una sola pregunta. ¿Cuál?",
+    "a": "«¿Qué puerta me diría el otro guardián?»",
+    "o": [
+     "«¿Eres el que dice la verdad?»",
+     "«¿Cuál es la puerta buena?»",
+     "«¿Mientes?»"
+    ],
+    "e": "Los dos señalarán la puerta equivocada, así que eliges la otra."
+   }
+  ]
+ ],
+ "math": [
+  [
+   {
+    "q": "En un árbol hay 11 pájaros y se van volando 7. ¿Cuántos pájaros quedan?",
+    "a": "4 pájaros",
+    "e": "11 − 7 = 4"
+   },
+   {
+    "q": "Leo tiene 8 canicas y su abuela le regala 2 más. ¿Cuántas canicas tiene ahora?",
+    "a": "10 canicas",
+    "e": "8 + 2 = 10"
+   },
+   {
+    "q": "En un árbol hay 12 pájaros y se van volando 7. ¿Cuántos pájaros quedan?",
+    "a": "5 pájaros",
+    "e": "12 − 7 = 5"
+   },
+   {
+    "q": "Mateo tiene 7 canicas y su abuela le regala 6 más. ¿Cuántas canicas tiene ahora?",
+    "a": "13 canicas",
+    "e": "7 + 6 = 13"
+   },
+   {
+    "q": "En el patio juegan 3 gatos. ¿Cuántas patas hay en total?",
+    "a": "12 patas",
+    "e": "3 gatos × 4 patas = 12"
+   },
+   {
+    "q": "2 niños comen 2 galletas cada uno. ¿Cuántas galletas se comen entre todos?",
+    "a": "4 galletas",
+    "e": "2 × 2 = 4"
+   },
+   {
+    "q": "Hugo tiene 7 canicas y su abuela le regala 8 más. ¿Cuántas canicas tiene ahora?",
+    "a": "15 canicas",
+    "e": "7 + 8 = 15"
+   },
+   {
+    "q": "En el patio juegan 4 gatos. ¿Cuántas patas hay en total?",
+    "a": "16 patas",
+    "e": "4 gatos × 4 patas = 16"
+   },
+   {
+    "q": "En un árbol hay 10 pájaros y se van volando 2. ¿Cuántos pájaros quedan?",
+    "a": "8 pájaros",
+    "e": "10 − 2 = 8"
+   },
+   {
+    "q": "5 niños comen 2 galletas cada uno. ¿Cuántas galletas se comen entre todos?",
+    "a": "10 galletas",
+    "e": "5 × 2 = 10"
+   },
+   {
+    "q": "Mateo tiene 6 canicas y su abuela le regala 9 más. ¿Cuántas canicas tiene ahora?",
+    "a": "15 canicas",
+    "e": "6 + 9 = 15"
+   },
+   {
+    "q": "En el patio juegan 2 gatos. ¿Cuántas patas hay en total?",
+    "a": "8 patas",
+    "e": "2 gatos × 4 patas = 8"
+   },
+   {
+    "q": "En un árbol hay 14 pájaros y se van volando 9. ¿Cuántos pájaros quedan?",
+    "a": "5 pájaros",
+    "e": "14 − 9 = 5"
+   },
+   {
+    "q": "En un árbol hay 10 pájaros y se van volando 4. ¿Cuántos pájaros quedan?",
+    "a": "6 pájaros",
+    "e": "10 − 4 = 6"
+   },
+   {
+    "q": "Daniel tiene 7 canicas y su abuela le regala 7 más. ¿Cuántas canicas tiene ahora?",
+    "a": "14 canicas",
+    "e": "7 + 7 = 14"
+   },
+   {
+    "q": "En un árbol hay 8 pájaros y se van volando 5. ¿Cuántos pájaros quedan?",
+    "a": "3 pájaros",
+    "e": "8 − 5 = 3"
+   },
+   {
+    "q": "Alba tiene 4 canicas y su abuela le regala 3 más. ¿Cuántas canicas tiene ahora?",
+    "a": "7 canicas",
+    "e": "4 + 3 = 7"
+   },
+   {
+    "q": "Alba tiene 6 canicas y su abuela le regala 8 más. ¿Cuántas canicas tiene ahora?",
+    "a": "14 canicas",
+    "e": "6 + 8 = 14"
+   },
+   {
+    "q": "En un árbol hay 10 pájaros y se van volando 6. ¿Cuántos pájaros quedan?",
+    "a": "4 pájaros",
+    "e": "10 − 6 = 4"
+   },
+   {
+    "q": "Daniel tiene 8 canicas y su abuela le regala 3 más. ¿Cuántas canicas tiene ahora?",
+    "a": "11 canicas",
+    "e": "8 + 3 = 11"
+   },
+   {
+    "q": "3 niños comen 2 galletas cada uno. ¿Cuántas galletas se comen entre todos?",
+    "a": "6 galletas",
+    "e": "3 × 2 = 6"
+   },
+   {
+    "q": "4 niños comen 2 galletas cada uno. ¿Cuántas galletas se comen entre todos?",
+    "a": "8 galletas",
+    "e": "4 × 2 = 8"
+   },
+   {
+    "q": "Daniel tiene 5 canicas y su abuela le regala 7 más. ¿Cuántas canicas tiene ahora?",
+    "a": "12 canicas",
+    "e": "5 + 7 = 12"
+   },
+   {
+    "q": "Hugo tiene 9 canicas y su abuela le regala 5 más. ¿Cuántas canicas tiene ahora?",
+    "a": "14 canicas",
+    "e": "9 + 5 = 14"
+   },
+   {
+    "q": "En un árbol hay 15 pájaros y se van volando 3. ¿Cuántos pájaros quedan?",
+    "a": "12 pájaros",
+    "e": "15 − 3 = 12"
+   },
+   {
+    "q": "Vera tiene 6 canicas y su abuela le regala 9 más. ¿Cuántas canicas tiene ahora?",
+    "a": "15 canicas",
+    "e": "6 + 9 = 15"
+   },
+   {
+    "q": "Hugo tiene 6 canicas y su abuela le regala 4 más. ¿Cuántas canicas tiene ahora?",
+    "a": "10 canicas",
+    "e": "6 + 4 = 10"
+   },
+   {
+    "q": "Alba tiene 5 canicas y su abuela le regala 5 más. ¿Cuántas canicas tiene ahora?",
+    "a": "10 canicas",
+    "e": "5 + 5 = 10"
+   },
+   {
+    "q": "Mateo tiene 6 canicas y su abuela le regala 7 más. ¿Cuántas canicas tiene ahora?",
+    "a": "13 canicas",
+    "e": "6 + 7 = 13"
+   },
+   {
+    "q": "Sofía tiene 6 canicas y su abuela le regala 9 más. ¿Cuántas canicas tiene ahora?",
+    "a": "15 canicas",
+    "e": "6 + 9 = 15"
+   },
+   {
+    "q": "Mateo tiene 3 canicas y su abuela le regala 4 más. ¿Cuántas canicas tiene ahora?",
+    "a": "7 canicas",
+    "e": "3 + 4 = 7"
+   },
+   {
+    "q": "En un árbol hay 15 pájaros y se van volando 8. ¿Cuántos pájaros quedan?",
+    "a": "7 pájaros",
+    "e": "15 − 8 = 7"
+   },
+   {
+    "q": "En un árbol hay 11 pájaros y se van volando 8. ¿Cuántos pájaros quedan?",
+    "a": "3 pájaros",
+    "e": "11 − 8 = 3"
+   },
+   {
+    "q": "Hugo tiene 7 canicas y su abuela le regala 5 más. ¿Cuántas canicas tiene ahora?",
+    "a": "12 canicas",
+    "e": "7 + 5 = 12"
+   },
+   {
+    "q": "Mateo tiene 9 canicas y su abuela le regala 8 más. ¿Cuántas canicas tiene ahora?",
+    "a": "17 canicas",
+    "e": "9 + 8 = 17"
+   },
+   {
+    "q": "En un árbol hay 9 pájaros y se van volando 3. ¿Cuántos pájaros quedan?",
+    "a": "6 pájaros",
+    "e": "9 − 3 = 6"
+   },
+   {
+    "q": "En un árbol hay 14 pájaros y se van volando 4. ¿Cuántos pájaros quedan?",
+    "a": "10 pájaros",
+    "e": "14 − 4 = 10"
+   },
+   {
+    "q": "En un árbol hay 8 pájaros y se van volando 4. ¿Cuántos pájaros quedan?",
+    "a": "4 pájaros",
+    "e": "8 − 4 = 4"
+   },
+   {
+    "q": "En un árbol hay 13 pájaros y se van volando 10. ¿Cuántos pájaros quedan?",
+    "a": "3 pájaros",
+    "e": "13 − 10 = 3"
+   },
+   {
+    "q": "Daniel tiene 4 canicas y su abuela le regala 6 más. ¿Cuántas canicas tiene ahora?",
+    "a": "10 canicas",
+    "e": "4 + 6 = 10"
+   },
+   {
+    "q": "Martina tiene 4 canicas y su abuela le regala 4 más. ¿Cuántas canicas tiene ahora?",
+    "a": "8 canicas",
+    "e": "4 + 4 = 8"
+   },
+   {
+    "q": "Daniel tiene 7 canicas y su abuela le regala 6 más. ¿Cuántas canicas tiene ahora?",
+    "a": "13 canicas",
+    "e": "7 + 6 = 13"
+   },
+   {
+    "q": "Hugo tiene 9 canicas y su abuela le regala 3 más. ¿Cuántas canicas tiene ahora?",
+    "a": "12 canicas",
+    "e": "9 + 3 = 12"
+   },
+   {
+    "q": "Martina tiene 4 canicas y su abuela le regala 2 más. ¿Cuántas canicas tiene ahora?",
+    "a": "6 canicas",
+    "e": "4 + 2 = 6"
+   },
+   {
+    "q": "Alba tiene 9 canicas y su abuela le regala 7 más. ¿Cuántas canicas tiene ahora?",
+    "a": "16 canicas",
+    "e": "9 + 7 = 16"
+   },
+   {
+    "q": "Lucía tiene 5 canicas y su abuela le regala 9 más. ¿Cuántas canicas tiene ahora?",
+    "a": "14 canicas",
+    "e": "5 + 9 = 14"
+   },
+   {
+    "q": "Leo tiene 6 canicas y su abuela le regala 3 más. ¿Cuántas canicas tiene ahora?",
+    "a": "9 canicas",
+    "e": "6 + 3 = 9"
+   },
+   {
+    "q": "En un árbol hay 14 pájaros y se van volando 2. ¿Cuántos pájaros quedan?",
+    "a": "12 pájaros",
+    "e": "14 − 2 = 12"
+   },
+   {
+    "q": "Hugo tiene 8 canicas y su abuela le regala 8 más. ¿Cuántas canicas tiene ahora?",
+    "a": "16 canicas",
+    "e": "8 + 8 = 16"
+   },
+   {
+    "q": "Daniel tiene 6 canicas y su abuela le regala 7 más. ¿Cuántas canicas tiene ahora?",
+    "a": "13 canicas",
+    "e": "6 + 7 = 13"
+   },
+   {
+    "q": "Martina tiene 8 canicas y su abuela le regala 9 más. ¿Cuántas canicas tiene ahora?",
+    "a": "17 canicas",
+    "e": "8 + 9 = 17"
+   },
+   {
+    "q": "Mateo tiene 3 canicas y su abuela le regala 9 más. ¿Cuántas canicas tiene ahora?",
+    "a": "12 canicas",
+    "e": "3 + 9 = 12"
+   },
+   {
+    "q": "En un árbol hay 9 pájaros y se van volando 5. ¿Cuántos pájaros quedan?",
+    "a": "4 pájaros",
+    "e": "9 − 5 = 4"
+   },
+   {
+    "q": "Hugo tiene 3 canicas y su abuela le regala 4 más. ¿Cuántas canicas tiene ahora?",
+    "a": "7 canicas",
+    "e": "3 + 4 = 7"
+   },
+   {
+    "q": "Pablo tiene 3 canicas y su abuela le regala 8 más. ¿Cuántas canicas tiene ahora?",
+    "a": "11 canicas",
+    "e": "3 + 8 = 11"
+   },
+   {
+    "q": "En un árbol hay 11 pájaros y se van volando 2. ¿Cuántos pájaros quedan?",
+    "a": "9 pájaros",
+    "e": "11 − 2 = 9"
+   },
+   {
+    "q": "Mateo tiene 6 canicas y su abuela le regala 5 más. ¿Cuántas canicas tiene ahora?",
+    "a": "11 canicas",
+    "e": "6 + 5 = 11"
+   },
+   {
+    "q": "En un árbol hay 14 pájaros y se van volando 10. ¿Cuántos pájaros quedan?",
+    "a": "4 pájaros",
+    "e": "14 − 10 = 4"
+   },
+   {
+    "q": "Hugo tiene 7 canicas y su abuela le regala 2 más. ¿Cuántas canicas tiene ahora?",
+    "a": "9 canicas",
+    "e": "7 + 2 = 9"
+   },
+   {
+    "q": "En un árbol hay 14 pájaros y se van volando 11. ¿Cuántos pájaros quedan?",
+    "a": "3 pájaros",
+    "e": "14 − 11 = 3"
+   }
+  ],
+  [
+   {
+    "q": "El cole empieza a las 9:00 y el recreo llega 45 minutos después. ¿A qué hora es el recreo?",
+    "a": "9:45",
+    "e": "9:00 + 45 minutos = 9:45"
+   },
+   {
+    "q": "Una caja tiene 8 filas de 9 bombones. ¿Cuántos bombones hay?",
+    "a": "72 bombones",
+    "e": "8 × 9 = 72"
+   },
+   {
+    "q": "Un cuaderno cuesta 5 € y un lápiz 1 €. Vera paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "14 €",
+    "e": "5 + 1 = 6; 20 − 6 = 14"
+   },
+   {
+    "q": "Lucía compra 5 sobres con 8 cromos cada uno y regala 2 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "38 cromos",
+    "e": "5 × 8 = 40; 40 − 2 = 38"
+   },
+   {
+    "q": "Sofía compra 5 sobres con 8 cromos cada uno y regala 6 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "34 cromos",
+    "e": "5 × 8 = 40; 40 − 6 = 34"
+   },
+   {
+    "q": "Un cuaderno cuesta 7 € y un lápiz 1 €. Mateo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "12 €",
+    "e": "7 + 1 = 8; 20 − 8 = 12"
+   },
+   {
+    "q": "Hay 48 fresas para repartir a partes iguales entre 6 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "8 fresas",
+    "e": "48 ÷ 6 = 8"
+   },
+   {
+    "q": "Martina compra 3 sobres con 4 cromos cada uno y regala 5 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "7 cromos",
+    "e": "3 × 4 = 12; 12 − 5 = 7"
+   },
+   {
+    "q": "Mateo compra 3 sobres con 7 cromos cada uno y regala 9 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "12 cromos",
+    "e": "3 × 7 = 21; 21 − 9 = 12"
+   },
+   {
+    "q": "Hay 42 fresas para repartir a partes iguales entre 6 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "7 fresas",
+    "e": "42 ÷ 6 = 7"
+   },
+   {
+    "q": "Hugo compra 6 sobres con 4 cromos cada uno y regala 3 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "21 cromos",
+    "e": "6 × 4 = 24; 24 − 3 = 21"
+   },
+   {
+    "q": "El cole empieza a las 9:00 y el recreo llega 90 minutos después. ¿A qué hora es el recreo?",
+    "a": "10:30",
+    "e": "9:00 + 90 minutos = 10:30"
+   },
+   {
+    "q": "Un cuaderno cuesta 5 € y un lápiz 2 €. Leo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "5 + 2 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Hugo compra 5 sobres con 7 cromos cada uno y regala 5 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "30 cromos",
+    "e": "5 × 7 = 35; 35 − 5 = 30"
+   },
+   {
+    "q": "Un cuaderno cuesta 6 € y un lápiz 1 €. Pablo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "6 + 1 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Un cuaderno cuesta 3 € y un lápiz 4 €. Sofía paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "3 + 4 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Hay 24 fresas para repartir a partes iguales entre 3 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "8 fresas",
+    "e": "24 ÷ 3 = 8"
+   },
+   {
+    "q": "Hay 12 fresas para repartir a partes iguales entre 3 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "4 fresas",
+    "e": "12 ÷ 3 = 4"
+   },
+   {
+    "q": "Hay 25 fresas para repartir a partes iguales entre 5 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "5 fresas",
+    "e": "25 ÷ 5 = 5"
+   },
+   {
+    "q": "El cole empieza a las 10:00 y el recreo llega 75 minutos después. ¿A qué hora es el recreo?",
+    "a": "11:15",
+    "e": "10:00 + 75 minutos = 11:15"
+   },
+   {
+    "q": "Daniel compra 4 sobres con 7 cromos cada uno y regala 3 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "25 cromos",
+    "e": "4 × 7 = 28; 28 − 3 = 25"
+   },
+   {
+    "q": "Una caja tiene 6 filas de 3 bombones. ¿Cuántos bombones hay?",
+    "a": "18 bombones",
+    "e": "6 × 3 = 18"
+   },
+   {
+    "q": "Hay 30 fresas para repartir a partes iguales entre 5 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "6 fresas",
+    "e": "30 ÷ 5 = 6"
+   },
+   {
+    "q": "Una caja tiene 7 filas de 9 bombones. ¿Cuántos bombones hay?",
+    "a": "63 bombones",
+    "e": "7 × 9 = 63"
+   },
+   {
+    "q": "Un cuaderno cuesta 5 € y un lápiz 3 €. Pablo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "12 €",
+    "e": "5 + 3 = 8; 20 − 8 = 12"
+   },
+   {
+    "q": "Hay 20 fresas para repartir a partes iguales entre 4 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "5 fresas",
+    "e": "20 ÷ 4 = 5"
+   },
+   {
+    "q": "El cole empieza a las 10:00 y el recreo llega 45 minutos después. ¿A qué hora es el recreo?",
+    "a": "10:45",
+    "e": "10:00 + 45 minutos = 10:45"
+   },
+   {
+    "q": "El cole empieza a las 8:00 y el recreo llega 45 minutos después. ¿A qué hora es el recreo?",
+    "a": "8:45",
+    "e": "8:00 + 45 minutos = 8:45"
+   },
+   {
+    "q": "Un cuaderno cuesta 3 € y un lápiz 3 €. Hugo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "14 €",
+    "e": "3 + 3 = 6; 20 − 6 = 14"
+   },
+   {
+    "q": "Un cuaderno cuesta 3 € y un lápiz 2 €. Mateo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "15 €",
+    "e": "3 + 2 = 5; 20 − 5 = 15"
+   },
+   {
+    "q": "Martina compra 4 sobres con 4 cromos cada uno y regala 2 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "14 cromos",
+    "e": "4 × 4 = 16; 16 − 2 = 14"
+   },
+   {
+    "q": "Martina compra 5 sobres con 5 cromos cada uno y regala 8 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "17 cromos",
+    "e": "5 × 5 = 25; 25 − 8 = 17"
+   },
+   {
+    "q": "Hay 21 fresas para repartir a partes iguales entre 3 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "7 fresas",
+    "e": "21 ÷ 3 = 7"
+   },
+   {
+    "q": "Un cuaderno cuesta 4 € y un lápiz 3 €. Lucía paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "4 + 3 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Mateo compra 5 sobres con 5 cromos cada uno y regala 4 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "21 cromos",
+    "e": "5 × 5 = 25; 25 − 4 = 21"
+   },
+   {
+    "q": "Un cuaderno cuesta 4 € y un lápiz 3 €. Daniel paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "4 + 3 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Una caja tiene 9 filas de 6 bombones. ¿Cuántos bombones hay?",
+    "a": "54 bombones",
+    "e": "9 × 6 = 54"
+   },
+   {
+    "q": "Una caja tiene 7 filas de 8 bombones. ¿Cuántos bombones hay?",
+    "a": "56 bombones",
+    "e": "7 × 8 = 56"
+   },
+   {
+    "q": "Hay 35 fresas para repartir a partes iguales entre 5 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "7 fresas",
+    "e": "35 ÷ 5 = 7"
+   },
+   {
+    "q": "Un cuaderno cuesta 5 € y un lápiz 1 €. Alba paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "14 €",
+    "e": "5 + 1 = 6; 20 − 6 = 14"
+   },
+   {
+    "q": "Un cuaderno cuesta 7 € y un lápiz 1 €. Daniel paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "12 €",
+    "e": "7 + 1 = 8; 20 − 8 = 12"
+   },
+   {
+    "q": "Una caja tiene 7 filas de 4 bombones. ¿Cuántos bombones hay?",
+    "a": "28 bombones",
+    "e": "7 × 4 = 28"
+   },
+   {
+    "q": "Una caja tiene 8 filas de 8 bombones. ¿Cuántos bombones hay?",
+    "a": "64 bombones",
+    "e": "8 × 8 = 64"
+   },
+   {
+    "q": "Hay 32 fresas para repartir a partes iguales entre 4 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "8 fresas",
+    "e": "32 ÷ 4 = 8"
+   },
+   {
+    "q": "El cole empieza a las 8:00 y el recreo llega 90 minutos después. ¿A qué hora es el recreo?",
+    "a": "9:30",
+    "e": "8:00 + 90 minutos = 9:30"
+   },
+   {
+    "q": "Hay 28 fresas para repartir a partes iguales entre 4 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "7 fresas",
+    "e": "28 ÷ 4 = 7"
+   },
+   {
+    "q": "El cole empieza a las 8:00 y el recreo llega 120 minutos después. ¿A qué hora es el recreo?",
+    "a": "10:00",
+    "e": "8:00 + 120 minutos = 10:00"
+   },
+   {
+    "q": "Leo compra 5 sobres con 8 cromos cada uno y regala 3 cromos a su amiga. ¿Cuántos cromos le quedan?",
+    "a": "37 cromos",
+    "e": "5 × 8 = 40; 40 − 3 = 37"
+   },
+   {
+    "q": "Una caja tiene 9 filas de 5 bombones. ¿Cuántos bombones hay?",
+    "a": "45 bombones",
+    "e": "9 × 5 = 45"
+   },
+   {
+    "q": "El cole empieza a las 10:00 y el recreo llega 90 minutos después. ¿A qué hora es el recreo?",
+    "a": "11:30",
+    "e": "10:00 + 90 minutos = 11:30"
+   },
+   {
+    "q": "Hay 12 fresas para repartir a partes iguales entre 4 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "3 fresas",
+    "e": "12 ÷ 4 = 3"
+   },
+   {
+    "q": "Un cuaderno cuesta 5 € y un lápiz 2 €. Martina paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "5 + 2 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Hay 18 fresas para repartir a partes iguales entre 3 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "6 fresas",
+    "e": "18 ÷ 3 = 6"
+   },
+   {
+    "q": "Un cuaderno cuesta 6 € y un lápiz 2 €. Sofía paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "12 €",
+    "e": "6 + 2 = 8; 20 − 8 = 12"
+   },
+   {
+    "q": "Un cuaderno cuesta 6 € y un lápiz 1 €. Martina paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "13 €",
+    "e": "6 + 1 = 7; 20 − 7 = 13"
+   },
+   {
+    "q": "Un cuaderno cuesta 7 € y un lápiz 2 €. Leo paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "11 €",
+    "e": "7 + 2 = 9; 20 − 9 = 11"
+   },
+   {
+    "q": "Una caja tiene 6 filas de 6 bombones. ¿Cuántos bombones hay?",
+    "a": "36 bombones",
+    "e": "6 × 6 = 36"
+   },
+   {
+    "q": "Hay 15 fresas para repartir a partes iguales entre 5 amigos. ¿Cuántas fresas le tocan a cada uno?",
+    "a": "3 fresas",
+    "e": "15 ÷ 5 = 3"
+   },
+   {
+    "q": "Un cuaderno cuesta 3 € y un lápiz 2 €. Daniel paga con un billete de 20 €. ¿Cuánto le devuelven?",
+    "a": "15 €",
+    "e": "3 + 2 = 5; 20 − 5 = 15"
+   },
+   {
+    "q": "El cole empieza a las 9:00 y el recreo llega 30 minutos después. ¿A qué hora es el recreo?",
+    "a": "9:30",
+    "e": "9:00 + 30 minutos = 9:30"
+   }
+  ],
+  [
+   {
+    "q": "Un jardín rectangular mide 4 metros de largo y 6 de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?",
+    "a": "20 metros",
+    "e": "2 × (4 + 6) = 20"
+   },
+   {
+    "q": "Leo tiene el triple de edad que su prima, y entre las dos suman 76 años. ¿Cuántos años tiene Leo?",
+    "a": "57 años",
+    "e": "Prima = x, Leo = 3x; 4x = 76, x = 19; 3 × 19 = 57"
+   },
+   {
+    "q": "Un libro tiene 175 páginas y Martina ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "70 páginas",
+    "e": "Le faltan dos quintos: 175 ÷ 5 × 2 = 70"
+   },
+   {
+    "q": "En una fiesta hay 9 amigos y cada uno da la mano una vez a cada uno de los demás. ¿Cuántos apretones de manos hay?",
+    "a": "36 apretones",
+    "e": "Cada uno da 8; 9 × 8 = 72, pero así cada apretón se cuenta dos veces: ÷ 2 = 36"
+   },
+   {
+    "q": "Vera tiene 4 camisetas, 3 pantalones y 3 gorras. ¿De cuántas formas distintas puede vestirse con una prenda de cada?",
+    "a": "36 formas",
+    "e": "4 × 3 × 3 = 36"
+   },
+   {
+    "q": "Un libro tiene 185 páginas y Martina ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "74 páginas",
+    "e": "Le faltan dos quintos: 185 ÷ 5 × 2 = 74"
+   },
+   {
+    "q": "Alba ha sacado 8, 6 y 7 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 7?",
+    "a": "Un 7",
+    "e": "Para media 7 en 4 exámenes hacen falta 28 puntos; 28 − 21 = 7"
+   },
+   {
+    "q": "Un libro tiene 95 páginas y Alba ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "38 páginas",
+    "e": "Le faltan dos quintos: 95 ÷ 5 × 2 = 38"
+   },
+   {
+    "q": "Una camiseta cuesta 60 € y tiene un 50 % de descuento. ¿Cuánto cuesta ahora?",
+    "a": "30 €",
+    "e": "El 50 % de 60 es 30 €; 60 − 30 = 30"
+   },
+   {
+    "q": "Un tren va a 100 km por hora. ¿Cuántos kilómetros recorre en 3 horas y media?",
+    "a": "350 km",
+    "e": "100 × 3 = 300; media hora son 50 km más"
+   },
+   {
+    "q": "Un jardín rectangular mide 12 metros de largo y 9 de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?",
+    "a": "42 metros",
+    "e": "2 × (12 + 9) = 42"
+   },
+   {
+    "q": "Un tren va a 90 km por hora. ¿Cuántos kilómetros recorre en 1 hora y media?",
+    "a": "135 km",
+    "e": "90 × 1 = 90; media hora son 45 km más"
+   },
+   {
+    "q": "Una camiseta cuesta 100 € y tiene un 10 % de descuento. ¿Cuánto cuesta ahora?",
+    "a": "90 €",
+    "e": "El 10 % de 100 es 10 €; 100 − 10 = 90"
+   },
+   {
+    "q": "Mateo ha sacado 8, 7 y 4 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 6?",
+    "a": "Un 5",
+    "e": "Para media 6 en 4 exámenes hacen falta 24 puntos; 24 − 19 = 5"
+   },
+   {
+    "q": "En una fiesta hay 8 amigos y cada uno da la mano una vez a cada uno de los demás. ¿Cuántos apretones de manos hay?",
+    "a": "28 apretones",
+    "e": "Cada uno da 7; 8 × 7 = 56, pero así cada apretón se cuenta dos veces: ÷ 2 = 28"
+   },
+   {
+    "q": "Lucía tiene 5 camisetas, 2 pantalones y 3 gorras. ¿De cuántas formas distintas puede vestirse con una prenda de cada?",
+    "a": "30 formas",
+    "e": "5 × 2 × 3 = 30"
+   },
+   {
+    "q": "Una camiseta cuesta 120 € y tiene un 10 % de descuento. ¿Cuánto cuesta ahora?",
+    "a": "108 €",
+    "e": "El 10 % de 120 es 12 €; 120 − 12 = 108"
+   },
+   {
+    "q": "Un libro tiene 65 páginas y Martina ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "26 páginas",
+    "e": "Le faltan dos quintos: 65 ÷ 5 × 2 = 26"
+   },
+   {
+    "q": "Una camiseta cuesta 40 € y tiene un 25 % de descuento. ¿Cuánto cuesta ahora?",
+    "a": "30 €",
+    "e": "El 25 % de 40 es 10 €; 40 − 10 = 30"
+   },
+   {
+    "q": "Un libro tiene 95 páginas y Sofía ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "38 páginas",
+    "e": "Le faltan dos quintos: 95 ÷ 5 × 2 = 38"
+   },
+   {
+    "q": "Una película empieza a las 16:45 y dura 115 minutos. ¿A qué hora termina?",
+    "a": "18:40",
+    "e": "115 minutos = 1 h 55 min; 16:45 + 1 h 55 min = 18:40"
+   },
+   {
+    "q": "Martina tiene el triple de edad que su prima, y entre las dos suman 100 años. ¿Cuántos años tiene Martina?",
+    "a": "75 años",
+    "e": "Prima = x, Martina = 3x; 4x = 100, x = 25; 3 × 25 = 75"
+   },
+   {
+    "q": "Martina tiene el triple de edad que su prima, y entre las dos suman 64 años. ¿Cuántos años tiene Martina?",
+    "a": "48 años",
+    "e": "Prima = x, Martina = 3x; 4x = 64, x = 16; 3 × 16 = 48"
+   },
+   {
+    "q": "Leo tiene el triple de edad que su prima, y entre las dos suman 64 años. ¿Cuántos años tiene Leo?",
+    "a": "48 años",
+    "e": "Prima = x, Leo = 3x; 4x = 64, x = 16; 3 × 16 = 48"
+   },
+   {
+    "q": "En una fiesta hay 5 amigos y cada uno da la mano una vez a cada uno de los demás. ¿Cuántos apretones de manos hay?",
+    "a": "10 apretones",
+    "e": "Cada uno da 4; 5 × 4 = 20, pero así cada apretón se cuenta dos veces: ÷ 2 = 10"
+   },
+   {
+    "q": "Pablo tiene el triple de edad que su prima, y entre las dos suman 104 años. ¿Cuántos años tiene Pablo?",
+    "a": "78 años",
+    "e": "Prima = x, Pablo = 3x; 4x = 104, x = 26; 3 × 26 = 78"
+   },
+   {
+    "q": "Un tren va a 90 km por hora. ¿Cuántos kilómetros recorre en 2 horas y media?",
+    "a": "225 km",
+    "e": "90 × 2 = 180; media hora son 45 km más"
+   },
+   {
+    "q": "Una película empieza a las 16:50 y dura 115 minutos. ¿A qué hora termina?",
+    "a": "18:45",
+    "e": "115 minutos = 1 h 55 min; 16:50 + 1 h 55 min = 18:45"
+   },
+   {
+    "q": "Un libro tiene 110 páginas y Martina ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "44 páginas",
+    "e": "Le faltan dos quintos: 110 ÷ 5 × 2 = 44"
+   },
+   {
+    "q": "Lucía ha sacado 8, 9 y 5 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 8?",
+    "a": "Un 10",
+    "e": "Para media 8 en 4 exámenes hacen falta 32 puntos; 32 − 22 = 10"
+   },
+   {
+    "q": "Leo tiene el triple de edad que su prima, y entre las dos suman 88 años. ¿Cuántos años tiene Leo?",
+    "a": "66 años",
+    "e": "Prima = x, Leo = 3x; 4x = 88, x = 22; 3 × 22 = 66"
+   },
+   {
+    "q": "Alba ha sacado 9, 6 y 4 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 6?",
+    "a": "Un 5",
+    "e": "Para media 6 en 4 exámenes hacen falta 24 puntos; 24 − 19 = 5"
+   },
+   {
+    "q": "Un libro tiene 105 páginas y Sofía ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "42 páginas",
+    "e": "Le faltan dos quintos: 105 ÷ 5 × 2 = 42"
+   },
+   {
+    "q": "Un jardín rectangular mide 7 metros de largo y 7 de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?",
+    "a": "28 metros",
+    "e": "2 × (7 + 7) = 28"
+   },
+   {
+    "q": "Un jardín rectangular mide 12 metros de largo y 7 de ancho. ¿Cuál es su área?",
+    "a": "84 m²",
+    "e": "12 × 7 = 84"
+   },
+   {
+    "q": "Daniel tiene el triple de edad que su prima, y entre las dos suman 76 años. ¿Cuántos años tiene Daniel?",
+    "a": "57 años",
+    "e": "Prima = x, Daniel = 3x; 4x = 76, x = 19; 3 × 19 = 57"
+   },
+   {
+    "q": "En una fiesta hay 7 amigos y cada uno da la mano una vez a cada uno de los demás. ¿Cuántos apretones de manos hay?",
+    "a": "21 apretones",
+    "e": "Cada uno da 6; 7 × 6 = 42, pero así cada apretón se cuenta dos veces: ÷ 2 = 21"
+   },
+   {
+    "q": "En una fiesta hay 6 amigos y cada uno da la mano una vez a cada uno de los demás. ¿Cuántos apretones de manos hay?",
+    "a": "15 apretones",
+    "e": "Cada uno da 5; 6 × 5 = 30, pero así cada apretón se cuenta dos veces: ÷ 2 = 15"
+   },
+   {
+    "q": "Un jardín rectangular mide 10 metros de largo y 7 de ancho. ¿Cuál es su área?",
+    "a": "70 m²",
+    "e": "10 × 7 = 70"
+   },
+   {
+    "q": "Leo ha sacado 9, 5 y 8 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 7?",
+    "a": "Un 6",
+    "e": "Para media 7 en 4 exámenes hacen falta 28 puntos; 28 − 22 = 6"
+   },
+   {
+    "q": "Una película empieza a las 16:45 y dura 85 minutos. ¿A qué hora termina?",
+    "a": "18:10",
+    "e": "85 minutos = 1 h 25 min; 16:45 + 1 h 25 min = 18:10"
+   },
+   {
+    "q": "Mateo tiene el triple de edad que su prima, y entre las dos suman 116 años. ¿Cuántos años tiene Mateo?",
+    "a": "87 años",
+    "e": "Prima = x, Mateo = 3x; 4x = 116, x = 29; 3 × 29 = 87"
+   },
+   {
+    "q": "Un jardín rectangular mide 9 metros de largo y 4 de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?",
+    "a": "26 metros",
+    "e": "2 × (9 + 4) = 26"
+   },
+   {
+    "q": "Alba ha sacado 8, 9 y 7 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 8?",
+    "a": "Un 8",
+    "e": "Para media 8 en 4 exámenes hacen falta 32 puntos; 32 − 24 = 8"
+   },
+   {
+    "q": "Martina ha sacado 5, 7 y 6 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 6?",
+    "a": "Un 6",
+    "e": "Para media 6 en 4 exámenes hacen falta 24 puntos; 24 − 18 = 6"
+   },
+   {
+    "q": "Un libro tiene 75 páginas y Sofía ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "30 páginas",
+    "e": "Le faltan dos quintos: 75 ÷ 5 × 2 = 30"
+   },
+   {
+    "q": "Una película empieza a las 16:55 y dura 125 minutos. ¿A qué hora termina?",
+    "a": "19:00",
+    "e": "125 minutos = 2 h 5 min; 16:55 + 2 h 5 min = 19:00"
+   },
+   {
+    "q": "Lucía tiene 4 camisetas, 4 pantalones y 3 gorras. ¿De cuántas formas distintas puede vestirse con una prenda de cada?",
+    "a": "48 formas",
+    "e": "4 × 4 × 3 = 48"
+   },
+   {
+    "q": "Un libro tiene 200 páginas y Sofía ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "80 páginas",
+    "e": "Le faltan dos quintos: 200 ÷ 5 × 2 = 80"
+   },
+   {
+    "q": "Una camiseta cuesta 80 € y tiene un 25 % de descuento. ¿Cuánto cuesta ahora?",
+    "a": "60 €",
+    "e": "El 25 % de 80 es 20 €; 80 − 20 = 60"
+   },
+   {
+    "q": "Un tren va a 100 km por hora. ¿Cuántos kilómetros recorre en 1 hora y media?",
+    "a": "150 km",
+    "e": "100 × 1 = 100; media hora son 50 km más"
+   },
+   {
+    "q": "Un libro tiene 115 páginas y Alba ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "46 páginas",
+    "e": "Le faltan dos quintos: 115 ÷ 5 × 2 = 46"
+   },
+   {
+    "q": "Una película empieza a las 16:45 y dura 105 minutos. ¿A qué hora termina?",
+    "a": "18:30",
+    "e": "105 minutos = 1 h 45 min; 16:45 + 1 h 45 min = 18:30"
+   },
+   {
+    "q": "Un libro tiene 100 páginas y Pablo ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "40 páginas",
+    "e": "Le faltan dos quintos: 100 ÷ 5 × 2 = 40"
+   },
+   {
+    "q": "Daniel ha sacado 6, 8 y 5 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 7?",
+    "a": "Un 9",
+    "e": "Para media 7 en 4 exámenes hacen falta 28 puntos; 28 − 19 = 9"
+   },
+   {
+    "q": "Un jardín rectangular mide 8 metros de largo y 5 de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?",
+    "a": "26 metros",
+    "e": "2 × (8 + 5) = 26"
+   },
+   {
+    "q": "Un tren va a 100 km por hora. ¿Cuántos kilómetros recorre en 2 horas y media?",
+    "a": "250 km",
+    "e": "100 × 2 = 200; media hora son 50 km más"
+   },
+   {
+    "q": "Leo ha sacado 8, 7 y 9 en tres exámenes. ¿Qué nota necesita en el cuarto para que su media sea 8?",
+    "a": "Un 8",
+    "e": "Para media 8 en 4 exámenes hacen falta 32 puntos; 32 − 24 = 8"
+   },
+   {
+    "q": "Un jardín rectangular mide 7 metros de largo y 5 de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?",
+    "a": "24 metros",
+    "e": "2 × (7 + 5) = 24"
+   },
+   {
+    "q": "Un libro tiene 110 páginas y Alba ya ha leído tres quintas partes. ¿Cuántas páginas le faltan?",
+    "a": "44 páginas",
+    "e": "Le faltan dos quintos: 110 ÷ 5 × 2 = 44"
+   }
+  ],
+  [
+   {
+    "q": "Un abrigo de 175 € sube un 50 % y después baja un 50 %. ¿Cuánto cuesta al final?",
+    "a": "131,25 €",
+    "e": "No vuelve a 175 €: la bajada se calcula sobre el precio ya subido, 262,50 €."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 9:00?",
+    "a": "90°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 4:00?",
+    "a": "120°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Un abrigo de 75 € sube un 50 % y después baja un 50 %. ¿Cuánto cuesta al final?",
+    "a": "56,25 €",
+    "e": "No vuelve a 75 €: la bajada se calcula sobre el precio ya subido, 112,50 €."
+   },
+   {
+    "q": "Dentro de 6 años tendré el doble de la edad que tenía hace 5 años. ¿Cuántos años tengo?",
+    "a": "16 años",
+    "e": "a + 6 = 2 × (a − 5) → a = 6 + 2 × 5 = 16"
+   },
+   {
+    "q": "Dentro de 9 años tendré el doble de la edad que tenía hace 7 años. ¿Cuántos años tengo?",
+    "a": "23 años",
+    "e": "a + 9 = 2 × (a − 7) → a = 9 + 2 × 7 = 23"
+   },
+   {
+    "q": "Un grifo llena una bañera en 15 minutos y otro en 10. Abiertos a la vez, ¿cuánto tardan en llenarla?",
+    "a": "6 minutos",
+    "e": "En un minuto llenan 1/15 + 1/10 = 1/6 de la bañera."
+   },
+   {
+    "q": "¿Cuánto suman todos los números del 1 al 40, sin calculadora?",
+    "a": "820",
+    "e": "El truco de Gauss: emparejas 1 + 40, 2 + 39… Son 20 parejas de 41."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 600 km, uno hacia el otro, a 100 y 50 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "4 horas",
+    "e": "Se acercan a 150 km/h; 600 ÷ 150 = 4"
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 520 km, uno hacia el otro, a 60 y 70 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "4 horas",
+    "e": "Se acercan a 130 km/h; 520 ÷ 130 = 4"
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 300 km, uno hacia el otro, a 100 y 50 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "2 horas",
+    "e": "Se acercan a 150 km/h; 300 ÷ 150 = 2"
+   },
+   {
+    "q": "¿Cuánto suman todos los números del 1 al 30, sin calculadora?",
+    "a": "465",
+    "e": "El truco de Gauss: emparejas 1 + 30, 2 + 29… Son 15 parejas de 31."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 5:00?",
+    "a": "150°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Un abrigo de 175 € sube un 20 % y después baja un 20 %. ¿Cuánto cuesta al final?",
+    "a": "168 €",
+    "e": "No vuelve a 175 €: la bajada se calcula sobre el precio ya subido, 210 €."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 8:30?",
+    "a": "75°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 420 km, uno hacia el otro, a 90 y 50 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "3 horas",
+    "e": "Se acercan a 140 km/h; 420 ÷ 140 = 3"
+   },
+   {
+    "q": "Un abrigo de 50 € sube un 20 % y después baja un 20 %. ¿Cuánto cuesta al final?",
+    "a": "48 €",
+    "e": "No vuelve a 50 €: la bajada se calcula sobre el precio ya subido, 60 €."
+   },
+   {
+    "q": "Un abrigo de 200 € sube un 10 % y después baja un 10 %. ¿Cuánto cuesta al final?",
+    "a": "198,00 €",
+    "e": "No vuelve a 200 €: la bajada se calcula sobre el precio ya subido, 220,00 €."
+   },
+   {
+    "q": "¿Cuánto suman todos los números del 1 al 90, sin calculadora?",
+    "a": "4095",
+    "e": "El truco de Gauss: emparejas 1 + 90, 2 + 89… Son 45 parejas de 91."
+   },
+   {
+    "q": "Un abrigo de 100 € sube un 10 % y después baja un 10 %. ¿Cuánto cuesta al final?",
+    "a": "99,00 €",
+    "e": "No vuelve a 100 €: la bajada se calcula sobre el precio ya subido, 110,00 €."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 560 km, uno hacia el otro, a 60 y 80 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "4 horas",
+    "e": "Se acercan a 140 km/h; 560 ÷ 140 = 4"
+   },
+   {
+    "q": "Un abrigo de 200 € sube un 25 % y después baja un 25 %. ¿Cuánto cuesta al final?",
+    "a": "187,50 €",
+    "e": "No vuelve a 200 €: la bajada se calcula sobre el precio ya subido, 250 €."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 320 km, uno hacia el otro, a 110 y 50 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "2 horas",
+    "e": "Se acercan a 160 km/h; 320 ÷ 160 = 2"
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 480 km, uno hacia el otro, a 90 y 70 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "3 horas",
+    "e": "Se acercan a 160 km/h; 480 ÷ 160 = 3"
+   },
+   {
+    "q": "Un grifo llena una bañera en 12 minutos y otro en 6. Abiertos a la vez, ¿cuánto tardan en llenarla?",
+    "a": "4 minutos",
+    "e": "En un minuto llenan 1/12 + 1/6 = 1/4 de la bañera."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 340 km, uno hacia el otro, a 70 y 100 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "2 horas",
+    "e": "Se acercan a 170 km/h; 340 ÷ 170 = 2"
+   },
+   {
+    "q": "Un abrigo de 125 € sube un 25 % y después baja un 25 %. ¿Cuánto cuesta al final?",
+    "a": "117,19 €",
+    "e": "No vuelve a 125 €: la bajada se calcula sobre el precio ya subido, 156,25 €."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 600 km, uno hacia el otro, a 70 y 80 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "4 horas",
+    "e": "Se acercan a 150 km/h; 600 ÷ 150 = 4"
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 400 km, uno hacia el otro, a 100 y 100 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "2 horas",
+    "e": "Se acercan a 200 km/h; 400 ÷ 200 = 2"
+   },
+   {
+    "q": "Un abrigo de 75 € sube un 20 % y después baja un 20 %. ¿Cuánto cuesta al final?",
+    "a": "72 €",
+    "e": "No vuelve a 75 €: la bajada se calcula sobre el precio ya subido, 90 €."
+   },
+   {
+    "q": "Dentro de 11 años tendré el doble de la edad que tenía hace 7 años. ¿Cuántos años tengo?",
+    "a": "25 años",
+    "e": "a + 11 = 2 × (a − 7) → a = 11 + 2 × 7 = 25"
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 3:00?",
+    "a": "90°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 11:00?",
+    "a": "30°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 520 km, uno hacia el otro, a 80 y 50 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "4 horas",
+    "e": "Se acercan a 130 km/h; 520 ÷ 130 = 4"
+   },
+   {
+    "q": "Un abrigo de 200 € sube un 20 % y después baja un 20 %. ¿Cuánto cuesta al final?",
+    "a": "192 €",
+    "e": "No vuelve a 200 €: la bajada se calcula sobre el precio ya subido, 240 €."
+   },
+   {
+    "q": "Dentro de 7 años tendré el doble de la edad que tenía hace 2 años. ¿Cuántos años tengo?",
+    "a": "11 años",
+    "e": "a + 7 = 2 × (a − 2) → a = 7 + 2 × 2 = 11"
+   },
+   {
+    "q": "Dentro de 8 años tendré el doble de la edad que tenía hace 4 años. ¿Cuántos años tengo?",
+    "a": "16 años",
+    "e": "a + 8 = 2 × (a − 4) → a = 8 + 2 × 4 = 16"
+   },
+   {
+    "q": "Un abrigo de 100 € sube un 25 % y después baja un 25 %. ¿Cuánto cuesta al final?",
+    "a": "93,75 €",
+    "e": "No vuelve a 100 €: la bajada se calcula sobre el precio ya subido, 125 €."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 4:30?",
+    "a": "45°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Dentro de 12 años tendré el doble de la edad que tenía hace 5 años. ¿Cuántos años tengo?",
+    "a": "22 años",
+    "e": "a + 12 = 2 × (a − 5) → a = 12 + 2 × 5 = 22"
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 5:30?",
+    "a": "15°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Un abrigo de 100 € sube un 50 % y después baja un 50 %. ¿Cuánto cuesta al final?",
+    "a": "75 €",
+    "e": "No vuelve a 100 €: la bajada se calcula sobre el precio ya subido, 150 €."
+   },
+   {
+    "q": "Dentro de 5 años tendré el doble de la edad que tenía hace 8 años. ¿Cuántos años tengo?",
+    "a": "21 años",
+    "e": "a + 5 = 2 × (a − 8) → a = 5 + 2 × 8 = 21"
+   },
+   {
+    "q": "Dentro de 10 años tendré el doble de la edad que tenía hace 8 años. ¿Cuántos años tengo?",
+    "a": "26 años",
+    "e": "a + 10 = 2 × (a − 8) → a = 10 + 2 × 8 = 26"
+   },
+   {
+    "q": "¿Cuánto suman todos los números del 1 al 60, sin calculadora?",
+    "a": "1830",
+    "e": "El truco de Gauss: emparejas 1 + 60, 2 + 59… Son 30 parejas de 61."
+   },
+   {
+    "q": "Dentro de 11 años tendré el doble de la edad que tenía hace 2 años. ¿Cuántos años tengo?",
+    "a": "15 años",
+    "e": "a + 11 = 2 × (a − 2) → a = 11 + 2 × 2 = 15"
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 570 km, uno hacia el otro, a 120 y 70 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "3 horas",
+    "e": "Se acercan a 190 km/h; 570 ÷ 190 = 3"
+   },
+   {
+    "q": "Dentro de 9 años tendré el doble de la edad que tenía hace 2 años. ¿Cuántos años tengo?",
+    "a": "13 años",
+    "e": "a + 9 = 2 × (a − 2) → a = 9 + 2 × 2 = 13"
+   },
+   {
+    "q": "Dentro de 10 años tendré el doble de la edad que tenía hace 2 años. ¿Cuántos años tengo?",
+    "a": "14 años",
+    "e": "a + 10 = 2 × (a − 2) → a = 10 + 2 × 2 = 14"
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 450 km, uno hacia el otro, a 80 y 70 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "3 horas",
+    "e": "Se acercan a 150 km/h; 450 ÷ 150 = 3"
+   },
+   {
+    "q": "¿Cuánto suman todos los números del 1 al 80, sin calculadora?",
+    "a": "3240",
+    "e": "El truco de Gauss: emparejas 1 + 80, 2 + 79… Son 40 parejas de 81."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 640 km, uno hacia el otro, a 90 y 70 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "4 horas",
+    "e": "Se acercan a 160 km/h; 640 ÷ 160 = 4"
+   },
+   {
+    "q": "Dentro de 12 años tendré el doble de la edad que tenía hace 7 años. ¿Cuántos años tengo?",
+    "a": "26 años",
+    "e": "a + 12 = 2 × (a − 7) → a = 12 + 2 × 7 = 26"
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 1:30?",
+    "a": "135°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Un abrigo de 125 € sube un 50 % y después baja un 50 %. ¿Cuánto cuesta al final?",
+    "a": "93,75 €",
+    "e": "No vuelve a 125 €: la bajada se calcula sobre el precio ya subido, 187,50 €."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 6:00?",
+    "a": "180°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Dentro de 8 años tendré el doble de la edad que tenía hace 6 años. ¿Cuántos años tengo?",
+    "a": "20 años",
+    "e": "a + 8 = 2 × (a − 6) → a = 8 + 2 × 6 = 20"
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 8:00?",
+    "a": "120°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "¿Qué ángulo forman las agujas del reloj a las 9:30?",
+    "a": "105°",
+    "e": "La aguja de las horas avanza 30° por hora y 0,5° por minuto; la de los minutos, 6° por minuto."
+   },
+   {
+    "q": "Dos trenes salen a la vez de dos ciudades separadas por 420 km, uno hacia el otro, a 110 y 100 km/h. ¿Cuánto tardan en cruzarse?",
+    "a": "2 horas",
+    "e": "Se acercan a 210 km/h; 420 ÷ 210 = 2"
+   }
+  ]
+ ]
+}

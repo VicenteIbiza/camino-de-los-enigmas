@@ -18,8 +18,8 @@ const DIRS := [Vector2i(1, 0), Vector2i(1, -1), Vector2i(0, -1), Vector2i(-1, 0)
 const ROAD := {"A": [3, 0], "B": [3, 1], "C": [3, 2], "D": [3, 1, 5], "M": [3]}
 const TYPE := {
 	"start": [Color("f4efe2"), "▶"], "riddle": [Color("8b5bd6"), "?"], "logic": [Color("13917e"), "◆"], "math": [Color("e2602f"), "+"],
-	"skill": [Color("2f6fe0"), "✦"], "star": [Color("e9a917"), "★"], "quest": [Color("d08a2a"), "!"], "fork": [Color("ffd84a"), "⇆"],
-	"tavern": [Color("ffb347"), "⌂"], "dungeon": [Color("9b5cff"), "☗"], "boss": [Color("c8323f"), "☠"],
+	"skill": [Color("2f6fe0"), "✦"], "star": [Color("e9a917"), "★"], "quest": [Color("d08a2a"), "!"], "fork": [Color("ffd84a"), "⬌"],
+	"tavern": [Color("ffb347"), "☕"], "dungeon": [Color("9b5cff"), "☗"], "boss": [Color("c8323f"), "☠"],
 }
 const TYPE_NAME := {"riddle": "adivinanza", "logic": "acertijo", "math": "problema", "skill": "reto de habilidad", "star": "estrella", "quest": "misión", "fork": "cruce", "start": "salida"}
 
@@ -69,6 +69,17 @@ var touches := {}
 var pinch0 := 0.0
 var rng := RandomNumberGenerator.new()
 
+# game state
+var bank := {}
+var decks := {}
+var level := 2
+var stars := 0
+var rolls_used := 0
+var last_roll := 0
+var trail: Array = []
+var qpanel: Control
+var lbl_stats: Label
+
 # UI
 var ui: Control
 var lbl_name: Label
@@ -89,12 +100,16 @@ func _ready() -> void:
 	font_bold = load("res://assets/fonts/atkinson-700.woff2")
 	font_head = load("res://assets/fonts/grenze-700.woff2")
 	font_epic = load("res://assets/fonts/gotisch-700.woff2")
+	var sym: FontFile = load("res://assets/fonts/symbols.woff2")
+	for f in [font_body, font_bold, font_head, font_epic]:
+		f.fallbacks = [sym]
 	cam = Camera3D.new()
 	cam.fov = 38.0
 	cam.far = 300.0
 	add_child(cam)
 	world_env = WorldEnvironment.new()
 	add_child(world_env)
+	bank = JSON.parse_string(FileAccess.get_file_as_string("res://data/preguntas.json"))
 	build_path()
 	build_board()
 	build_tavern()
@@ -737,6 +752,65 @@ func walk_to(p: Vector3, dur: float) -> void:
 	await tw.finished
 
 
+# ---------------------------------------------------------------- cards
+func draw(cat: String) -> Dictionary:
+	if cat == "skill":
+		return {"cat": "skill", "game": ["memoria", "simon", "faroles"][randi() % 3]}
+	var src: Array = bank[cat][level]
+	var dk := "%s%d" % [cat, level]
+	if not decks.has(dk) or decks[dk].is_empty():
+		var idx := range(src.size())
+		idx.shuffle()
+		decks[dk] = idx
+	var c: Dictionary = src[decks[dk].pop_back()].duplicate(true)
+	c["cat"] = cat
+	if cat == "logic":
+		with_opts(c)
+	return c
+
+
+func with_opts(c: Dictionary) -> void:
+	var a: String = c["a"]
+	var d := []
+	if c.has("o"):
+		d = c["o"].duplicate()
+		d.shuffle()
+	else:
+		var re := RegEx.new()
+		re.compile("\\d+")
+		var m := re.search(a)
+		if m:
+			var v := int(m.get_string())
+			var pool := [v + 1, v - 1, v + 2, v - 2, v * 2, v + 10, v - 10]
+			pool.shuffle()
+			for x in pool:
+				var t := a.replace(m.get_string(), str(x))
+				if x > 1 and t != a and not d.has(t):
+					d.append(t)
+	if d.size() < 3:
+		var others := []
+		for x in bank["logic"][level]:
+			others.append(x["a"])
+		others.shuffle()
+		for x in others:
+			if d.size() >= 3:
+				break
+			if x != a and not d.has(x):
+				d.append(x)
+	var opts := [a]
+	opts.append_array(d.slice(0, 3))
+	opts.shuffle()
+	c["opts"] = opts
+	c["correct"] = opts.find(a)
+
+
+func update_stats() -> void:
+	var dots := ""
+	for i in 3:
+		dots += "●" if i >= rolls_used else "○"
+	lbl_stats.text = "%s · %d ★ · Tiradas %s" % [["Aprendiz", "Experto", "Genio", "Maestro"][level], stars, dots]
+
+
 # ---------------------------------------------------------------- flow
 func say(t: String) -> void:
 	lbl_msg.text = t
@@ -764,6 +838,9 @@ func roll_dice() -> void:
 	busy = true
 	btn_act.disabled = true
 	var v := randi_range(1, 6)
+	last_roll = v
+	rolls_used += 1
+	update_stats()
 	lbl_dice.visible = true
 	for k in 10:
 		lbl_dice.text = str(randi_range(1, 6))
@@ -785,6 +862,7 @@ func roll_dice() -> void:
 			play("Idle")
 			to = await choose_branch(n)
 		await walk_to(path_nodes[to]["p"], 0.43)
+		trail.append(n)
 		n = to
 		hero_at = n
 	play("Idle")
@@ -806,9 +884,62 @@ func landed(n: int) -> void:
 			say("¡La Fortaleza del Dragón! Aquí empezaría la batalla final.")
 			play("Cheer")
 			offer("Volver a la salida", back_to_start)
+		"riddle", "logic", "math", "skill":
+			busy = true
+			btn_act.disabled = true
+			qpanel.open(draw(t), level)
+			var good: bool = await qpanel.finished
+			busy = false
+			btn_act.disabled = false
+			after_question(good)
+		"star":
+			stars += 1
+			play("Cheer")
+			say("¡Una estrella! Ya tienes %d." % stars)
+			end_turn_or_continue()
 		_:
-			say("Casilla de %s. En el juego completo, aquí saldría la pregunta." % TYPE_NAME.get(t, t))
+			say("Casilla de %s." % TYPE_NAME.get(t, t))
+			end_turn_or_continue()
+
+
+func after_question(good: bool) -> void:
+	if good:
+		stars += 1
+		play("Cheer")
+		update_stats()
+		if rolls_used < 3:
+			say("¡Muy bien! +1 estrella. Puedes volver a tirar (%d de 3)." % (rolls_used + 1))
 			offer()
+		else:
+			say("¡Muy bien! +1 estrella. Ya has usado tus 3 tiradas: empieza un turno nuevo.")
+			rolls_used = 0
+			update_stats()
+			offer()
+		return
+	play("Hit_A")
+	say("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"])
+	busy = true
+	btn_act.disabled = true
+	await get_tree().create_timer(0.8).timeout
+	for i in last_roll:
+		if trail.is_empty():
+			break
+		var back: int = trail.pop_back()
+		await walk_to(path_nodes[back]["p"], 0.38)
+		hero_at = back
+	play("Idle")
+	busy = false
+	btn_act.disabled = false
+	rolls_used = 0
+	update_stats()
+	say("Turno nuevo. ¡Tira el dado!")
+	offer()
+
+
+func end_turn_or_continue() -> void:
+	rolls_used = 0
+	update_stats()
+	offer()
 
 
 func back_to_start() -> void:
@@ -994,6 +1125,19 @@ func _process(dt: float) -> void:
 
 
 func _unhandled_input(e: InputEvent) -> void:
+	# testing shortcuts on a keyboard: 1 riddle, 2 logic, 3 problem, 4-6 skill games
+	if e is InputEventKey and e.pressed and not busy and mode == "board":
+		var k: int = e.keycode - KEY_1
+		if k >= 0 and k <= 5:
+			busy = true
+			var c := draw(["riddle", "logic", "math", "skill", "skill", "skill"][k])
+			if k >= 3:
+				c["game"] = ["memoria", "simon", "faroles"][k - 3]
+			qpanel.open(c, level)
+			var good: bool = await qpanel.finished
+			busy = false
+			after_question(good)
+			return
 	if e is InputEventScreenTouch:
 		if e.pressed:
 			touches[e.index] = e.position
@@ -1097,11 +1241,19 @@ func build_ui() -> void:
 	lbl_name.add_theme_font_size_override("font_size", 32)
 	lbl_name.add_theme_color_override("font_color", Color("ffe2a0"))
 	col.add_child(lbl_name)
-	var hint := Label.new()
-	hint.text = "Arrastra para girar la cámara · pellizca para acercar"
-	hint.add_theme_font_size_override("font_size", 17)
-	hint.add_theme_color_override("font_color", Color("c9cde0"))
-	col.add_child(hint)
+	lbl_stats = Label.new()
+	lbl_stats.add_theme_font_size_override("font_size", 19)
+	lbl_stats.add_theme_color_override("font_color", Color("c9cde0"))
+	col.add_child(lbl_stats)
+	var lv := OptionButton.new()
+	for name in ["Aprendiz · 6 a 8 años", "Experto · 8 a 10 años", "Genio · 10 a 13 años", "Maestro · adultos"]:
+		lv.add_item(name)
+	lv.selected = level
+	lv.add_theme_font_size_override("font_size", 17)
+	lv.item_selected.connect(func(i):
+		level = i
+		update_stats())
+	col.add_child(lv)
 
 	# hero picker
 	picker = HBoxContainer.new()
@@ -1174,6 +1326,10 @@ func build_ui() -> void:
 	lbl_dice.visible = false
 	ui.add_child(lbl_dice)
 
+	qpanel = preload("res://question_panel.gd").new()
+	ui.add_child(qpanel)
+	qpanel.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
+
 	fade = ColorRect.new()
 	fade.color = Color(0, 0, 0, 0)
 	fade.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1181,6 +1337,7 @@ func build_ui() -> void:
 	ui.add_child(fade)
 	get_viewport().size_changed.connect(_on_resize)
 	_on_resize()
+	update_stats()
 
 
 func _on_resize() -> void:

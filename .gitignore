@@ -1,0 +1,5 @@
+# Godot
+godot/.godot/
+godot/build/
+*.tmp
+.DS_Store

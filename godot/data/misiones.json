@@ -1,0 +1,743 @@
+{
+ "seda": {
+  "zone": "Bosque",
+  "title": "La seda de las arañas",
+  "giver": {
+   "name": "Maese Hilario, el tejedor",
+   "cls": "arquera",
+   "color": "#2fa36b",
+   "aura": "nada"
+  },
+  "text": "¡Viajeros, ayuda! Unas arañas gigantes han cubierto mi taller de telarañas. Pero escuchad: su seda es la más fina del reino. Si me ayudáis a conseguirla sin hacerles daño, os pagaré bien.",
+  "choices": [
+   {
+    "label": "Espantarlas con antorchas",
+    "test": {
+     "roll": "fuerza",
+     "target": 55
+    },
+    "win": "Agitáis las antorchas y las arañas se retiran al fondo del bosque, dejando montones de seda brillante.",
+    "lose": "Las arañas no se asustan y os envuelven en hilos pegajosos. Tardáis un buen rato en soltaros."
+   },
+   {
+    "label": "Hablar con la Reina Araña",
+    "test": {
+     "card": "riddle"
+    },
+    "win": "La Reina Araña sonríe con sus ocho ojos: «Listo eres. Toma la seda que quieras».",
+    "lose": "«Respuesta equivocada», sisea la Reina, y os echa del bosque a escobazos de pata."
+   },
+   {
+    "label": "Seguir los hilos hasta el nido",
+    "test": {
+     "card": "skill",
+     "game": "laberinto"
+    },
+    "win": "Siguiendo los hilos llegáis a un nido abandonado: está lleno de seda sin dueño.",
+    "lose": "Los hilos se enredan y os perdéis entre los árboles."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 40,
+   "item": "escudo"
+  }
+ },
+ "peaje": {
+  "zone": "Puente",
+  "title": "Las cuentas del duende",
+  "giver": {
+   "name": "Lina, la barquera",
+   "cls": "maga",
+   "color": "#2d7fe0",
+   "aura": "nada"
+  },
+  "text": "Un duende muy cascarrabias se ha instalado bajo el puente. Dice que nadie cruza sin resolver sus cuentas, y ya tengo una cola de carros enorme. ¿Me echáis una mano?",
+  "choices": [
+   {
+    "label": "Resolver sus cuentas",
+    "test": {
+     "card": "math"
+    },
+    "win": "El duende revisa la respuesta, gruñe y se aparta: «Bah, está bien. Podéis pasar todos».",
+    "lose": "«¡Mal, mal y requetemal!», chilla el duende. Hoy no cruza nadie."
+   },
+   {
+    "label": "Cruzar a escondidas",
+    "test": {
+     "roll": "suerte",
+     "target": 60
+    },
+    "win": "Pasáis de puntillas mientras el duende ronca. Los carreteros os aplauden en silencio.",
+    "lose": "Una tabla cruje… ¡y el duende os pilla con las manos en la masa!"
+   },
+   {
+    "label": "Pagarle 2 estrellas",
+    "test": {
+     "pay": 2
+    },
+    "win": "El duende cuenta las estrellas, sonríe y deja pasar a todo el mundo. Lina os da las gracias."
+   }
+  ],
+  "reward": {
+   "stars": 2,
+   "xp": 30,
+   "item": "doble"
+  }
+ },
+ "mina": {
+  "zone": "Cueva",
+  "title": "La mina de las runas",
+  "giver": {
+   "name": "Brunilda, la enana minera",
+   "cls": "barbaro",
+   "color": "#e9a514",
+   "aura": "nada"
+  },
+  "text": "Mis abuelos cerraron esta mina con runas hace cien años y nadie recuerda por qué. Quiero abrirla, pero las runas son un acertijo… y algo hace ruido al otro lado.",
+  "choices": [
+   {
+    "label": "Descifrar las runas",
+    "test": {
+     "card": "logic"
+    },
+    "win": "Las runas se iluminan y la puerta se abre. Dentro solo había un topo gigante, que os regala el martillo de los abuelos.",
+    "lose": "Las runas chisporrotean y la puerta sigue cerrada."
+   },
+   {
+    "label": "Romper la puerta",
+    "test": {
+     "roll": "fuerza",
+     "target": 65
+    },
+    "win": "¡CRAAC! La puerta cede y encontráis el martillo rúnico de los abuelos de Brunilda.",
+    "lose": "La puerta ni se mueve y os duelen los brazos durante una semana."
+   },
+   {
+    "label": "Buscar otra entrada",
+    "test": {
+     "card": "skill",
+     "game": "faroles"
+    },
+    "win": "Encendiendo los viejos faroles de la mina descubrís una entrada secreta.",
+    "lose": "Los faroles se apagan uno tras otro y os quedáis a oscuras."
+   }
+  ],
+  "reward": {
+   "stars": 4,
+   "xp": 50,
+   "attr": "fuerza",
+   "relic": "Martillo rúnico"
+  }
+ },
+ "isla": {
+  "zone": "Río",
+  "title": "La isla del Abuelo Río",
+  "giver": {
+   "name": "Tomeo, el pescador",
+   "cls": "arquera",
+   "color": "#2d7fe0",
+   "aura": "hielo"
+  },
+  "text": "Cuando sube la niebla aparece una isla que no sale en ningún mapa. Dicen que allí vive el Abuelo Río, que regala perlas a quien responde sus preguntas. ¿Os atrevéis a remar hasta allí?",
+  "choices": [
+   {
+    "label": "Responder al Abuelo Río",
+    "test": {
+     "card": "riddle"
+    },
+    "win": "Una voz como de olas se ríe: «¡Bien dicho!». Una perla aparece en vuestra mano.",
+    "lose": "La niebla se cierra y la isla desaparece como si nunca hubiera existido."
+   },
+   {
+    "label": "Remar a ciegas en la niebla",
+    "test": {
+     "roll": "suerte",
+     "target": 55
+    },
+    "win": "La corriente os lleva justo a la orilla de la isla, donde brilla una perla enorme.",
+    "lose": "Dais vueltas y vueltas hasta acabar en el mismo muelle del que salisteis."
+   },
+   {
+    "label": "Ofrecerle 2 estrellas",
+    "test": {
+     "pay": 2
+    },
+    "win": "El Abuelo Río acepta el regalo y os devuelve el favor con su bendición."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 40,
+   "attr": "sabiduria",
+   "relic": "Perla del río"
+  }
+ },
+ "barco": {
+  "zone": "Pantano",
+  "title": "El barco de las luces",
+  "giver": {
+   "name": "Marisol, la niña del pantano",
+   "cls": "maga",
+   "color": "#e05c9b",
+   "aura": "nada"
+  },
+  "text": "Hay un barco encallado en el barro desde hace un mes. Por las noches salen lucecitas de la bodega y nadie se atreve a acercarse. Yo creo que hay alguien atrapado dentro.",
+  "choices": [
+   {
+    "label": "Explorar la cubierta",
+    "test": {
+     "card": "skill",
+     "game": "minas"
+    },
+    "win": "Esquivando tablas podridas llegáis a la bodega: ¡las luces eran luciérnagas encerradas! Al liberarlas, iluminan un cofre.",
+    "lose": "Una tabla se rompe y acabáis con el barro hasta las rodillas."
+   },
+   {
+    "label": "Llamar a quien esté dentro",
+    "test": {
+     "card": "logic"
+    },
+    "win": "Una vocecita responde: es un viejo marinero que se quedó dormido cien días. Agradecido, os da su reloj de arena mágico.",
+    "lose": "Nadie contesta… pero algo os salpica desde el agua."
+   },
+   {
+    "label": "Esperar al amanecer",
+    "test": {
+     "roll": "suerte",
+     "target": 50
+    },
+    "win": "Con la primera luz, la marea levanta el barco y descubrís el tesoro de la bodega.",
+    "lose": "Os quedáis dormidos y la marea se lleva el barco más lejos."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 45,
+   "item": "reloj"
+  }
+ },
+ "anillo": {
+  "zone": "Ruinas",
+  "title": "El anillo de piedra",
+  "giver": {
+   "name": "Sir Bruno, caballero retirado",
+   "cls": "caballero",
+   "color": "#c8323f",
+   "aura": "nada"
+  },
+  "text": "En estas ruinas hay un anillo de piedras negras. Lo hemos derribado mil veces y siempre vuelve a aparecer. La leyenda dice que debajo hay una espada capaz de deshacer el hechizo.",
+  "choices": [
+   {
+    "label": "Leer la inscripción",
+    "test": {
+     "card": "riddle"
+    },
+    "win": "Al decir la palabra correcta, las piedras se hunden en la tierra y aparece la Espada de Fuego.",
+    "lose": "Las letras se borran y el anillo os ignora."
+   },
+   {
+    "label": "Cavar bajo el anillo",
+    "test": {
+     "roll": "fuerza",
+     "target": 60
+    },
+    "win": "Cavando y cavando chocáis con un cofre de hierro: dentro brilla la espada.",
+    "lose": "Solo encontráis piedras, gusanos y un calcetín muy viejo."
+   },
+   {
+    "label": "Ordenar las piedras",
+    "test": {
+     "card": "skill",
+     "game": "deslizante"
+    },
+    "win": "Al colocar las piedras en su orden, el anillo suelta un suspiro y se duerme para siempre.",
+    "lose": "Las piedras vuelven solas a su sitio, burlonas."
+   }
+  ],
+  "reward": {
+   "stars": 4,
+   "xp": 50,
+   "item": "espada"
+  }
+ },
+ "musica": {
+  "zone": "Cementerio",
+  "title": "La melodía sin fin",
+  "giver": {
+   "name": "Alba, la juglar",
+   "cls": "maga",
+   "color": "#8b5bd6",
+   "aura": "sombra"
+  },
+  "text": "Desde que pasé junto a las Piedras Cantoras, una melodía me sigue a todas partes. ¡No puedo dormir! A quien encuentre de dónde sale le regalaré mi laúd de la suerte.",
+  "choices": [
+   {
+    "label": "Seguir la melodía",
+    "test": {
+     "card": "skill",
+     "game": "simon"
+    },
+    "win": "Repetís la melodía nota a nota hasta encontrar una caja de música escondida en una lápida. La cerráis y por fin hay silencio.",
+    "lose": "Las notas se mezclan y la música suena todavía más fuerte."
+   },
+   {
+    "label": "Adivinar el nombre de la canción",
+    "test": {
+     "card": "riddle"
+    },
+    "win": "Al oír su nombre, la canción se despide con un acorde final y se marcha.",
+    "lose": "La melodía cambia de ritmo, como si se riera de vosotros."
+   },
+   {
+    "label": "Cantar más fuerte que ella",
+    "test": {
+     "roll": "suerte",
+     "target": 60
+    },
+    "win": "¡Vuestro coro es tan desafinado que la melodía huye avergonzada!",
+    "lose": "Os quedáis afónicos y la melodía sigue tan tranquila."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 45,
+   "attr": "suerte",
+   "relic": "Laúd de la suerte"
+  }
+ },
+ "cumbre": {
+  "zone": "Desfiladero",
+  "title": "El zafiro de la cumbre",
+  "giver": {
+   "name": "Nuria, la escaladora",
+   "cls": "ninja",
+   "color": "#2fa36b",
+   "aura": "rayo"
+  },
+  "text": "Quien llegue primero a la cima de la Aguja de Piedra se llevará el zafiro que dejaron allí los antiguos. Me he torcido el tobillo… ¿subís por mí? Lo repartiremos.",
+  "choices": [
+   {
+    "label": "Escalar a toda prisa",
+    "test": {
+     "roll": "fuerza",
+     "target": 60
+    },
+    "win": "Llegáis a la cumbre sin aliento y el zafiro brilla bajo el sol.",
+    "lose": "Resbaláis en una roca suelta y bajáis antes de lo previsto."
+   },
+   {
+    "label": "Buscar el sendero seguro",
+    "test": {
+     "card": "skill",
+     "game": "laberinto"
+    },
+    "win": "Encontráis el viejo sendero en zigzag y subís sin peligro.",
+    "lose": "El sendero termina en un precipicio. Hay que dar media vuelta."
+   },
+   {
+    "label": "Calcular la ruta",
+    "test": {
+     "card": "math"
+    },
+    "win": "Vuestros cálculos son perfectos: la ruta más corta os deja junto al zafiro.",
+    "lose": "Un número mal puesto y acabáis en la cima equivocada."
+   }
+  ],
+  "reward": {
+   "stars": 4,
+   "xp": 50,
+   "item": "doble"
+  }
+ },
+ "posada": {
+  "zone": "Posada",
+  "title": "El sótano de la Posada del Grifo",
+  "giver": {
+   "name": "Doña Petra, la posadera",
+   "cls": "barbaro",
+   "color": "#e9a514",
+   "aura": "nada"
+  },
+  "text": "¡Bienvenidos a la Posada del Grifo! Aunque… tengo un problema. Cada noche desaparecen mis tartas de la despensa, del sótano sube un olor rarísimo y se oyen ronquidos. ¡Mis clientes creen que hay un fantasma!",
+  "choices": [
+   {
+    "label": "Bajar al sótano con faroles",
+    "test": {
+     "card": "skill",
+     "game": "faroles"
+    },
+    "win": "Al encender los faroles descubrís a un ogrito bebé, perdido y lleno de migas. ¡El olor eran sus calcetines! Doña Petra le da un trabajo de pinche de cocina.",
+    "lose": "Los faroles se apagan, algo ronca muy cerca… y salís escaleras arriba a toda prisa."
+   },
+   {
+    "label": "Interrogar a los clientes",
+    "test": {
+     "card": "logic"
+    },
+    "win": "Atando cabos descubrís que el mozo de cuadras dejaba la trampilla abierta. Por ahí entraba un ogrito perdido. ¡Misterio resuelto!",
+    "lose": "Cada cliente cuenta una historia distinta y acabáis más liados que al principio."
+   },
+   {
+    "label": "Poner una trampa de miel",
+    "test": {
+     "roll": "suerte",
+     "target": 50
+    },
+    "win": "A medianoche, un ogrito bebé queda pegado a la miel, feliz y chupándose los dedos. Ya no robará más: ¡ahora tiene tarta todos los días!",
+    "lose": "La única que cae en la trampa es la gata de la posada. Está muy ofendida."
+   }
+  ],
+  "reward": {
+   "stars": 2,
+   "xp": 30,
+   "item": "pista"
+  }
+ },
+ "granja": {
+  "zone": "Granja",
+  "title": "La cosecha mordisqueada",
+  "giver": {
+   "name": "Tío Anselmo, el granjero",
+   "cls": "caballero",
+   "color": "#2fa36b",
+   "aura": "nada"
+  },
+  "text": "Algo se come mis calabazas cada noche y deja unas huellas del tamaño de una carretilla. Los vecinos dicen que es un monstruo, pero yo creo que es otra cosa. ¿Me ayudáis a averiguarlo antes de la feria?",
+  "choices": [
+   {
+    "label": "Vigilar toda la noche",
+    "test": {
+     "roll": "suerte",
+     "target": 55
+    },
+    "win": "Bajo la luna aparece… ¡un conejo gigante! Es tímido y muy bueno. Le ofrecéis zanahorias y ahora ayuda a arar el campo.",
+    "lose": "Os quedáis dormidos entre las calabazas y por la mañana falta otra más."
+   },
+   {
+    "label": "Seguir las huellas",
+    "test": {
+     "card": "skill",
+     "game": "laberinto"
+    },
+    "win": "Las huellas llevan a una madriguera enorme donde un conejo gigante cuida de sus crías. Tío Anselmo decide compartir la cosecha.",
+    "lose": "Las huellas se pierden en el arroyo y volvéis con las botas empapadas."
+   },
+   {
+    "label": "Contar las calabazas",
+    "test": {
+     "card": "math"
+    },
+    "win": "Las cuentas no fallan: solo desaparecen las calabazas pequeñas. ¡Es un animal hambriento, no un monstruo! Lo encontráis y le dais de comer.",
+    "lose": "Os salen más calabazas de las que había. Algo ha fallado en las cuentas."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 40,
+   "attr": "suerte",
+   "relic": "Herradura de la granja"
+  }
+ },
+ "esclusa": {
+  "zone": "Esclusa",
+  "title": "Las compuertas atascadas",
+  "giver": {
+   "name": "Gaspar, el guarda de la esclusa",
+   "cls": "mecha",
+   "color": "#2d7fe0",
+   "aura": "rayo"
+  },
+  "text": "Las compuertas de mi esclusa se han atascado y hay diez barcas esperando para pasar. Las palancas tienen un orden secreto y los engranajes están llenos de barro. ¡Si no se abren hoy, el río se desbordará!",
+  "choices": [
+   {
+    "label": "Mover las palancas en orden",
+    "test": {
+     "card": "logic"
+    },
+    "win": "¡CLONC, CLONC, CLONC! Las palancas encajan en el orden correcto y las compuertas se abren. Las barcas pasan entre aplausos.",
+    "lose": "Una palanca equivocada y… ¡splash! Os cae un chorro de agua encima."
+   },
+   {
+    "label": "Empujar la compuerta",
+    "test": {
+     "roll": "fuerza",
+     "target": 60
+    },
+    "win": "Empujáis con todas vuestras fuerzas y la compuerta cede poco a poco. Gaspar no se lo puede creer.",
+    "lose": "La compuerta pesa más que un dragón dormido. Ni se mueve."
+   },
+   {
+    "label": "Limpiar los engranajes",
+    "test": {
+     "card": "skill",
+     "game": "deslizante"
+    },
+    "win": "Colocáis cada pieza del mecanismo en su sitio y las ruedas vuelven a girar.",
+    "lose": "Las piezas no encajan y una rueda se escapa rodando río abajo."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 40,
+   "item": "portal"
+  }
+ },
+ "torre": {
+  "zone": "Torre de señales",
+  "title": "La torre que se quedó a oscuras",
+  "giver": {
+   "name": "Olga, la vigía",
+   "cls": "arquera",
+   "color": "#c8323f",
+   "aura": "rayo"
+  },
+  "text": "Desde esta torre avisamos con luces cuando se acerca el Gólem. Pero cada noche alguien apaga la hoguera de arriba y nadie lo ve. ¿Quién vigila a los vigilantes? ¡Necesito ojos nuevos!",
+  "choices": [
+   {
+    "label": "Encender las luces de aviso",
+    "test": {
+     "card": "skill",
+     "game": "faroles"
+    },
+    "win": "Las luces vuelven a brillar… y descubrís a quien las apagaba: una familia de lechuzas que quería dormir a oscuras. Olga les construye un nido nuevo.",
+    "lose": "Cada luz que encendéis se apaga sola. ¡Qué misterio!"
+   },
+   {
+    "label": "Subir por la escalera rota",
+    "test": {
+     "roll": "fuerza",
+     "target": 55
+    },
+    "win": "Trepáis peldaño a peldaño hasta la cima y pilláis a una lechuza soplando el fuego. ¡Ulú!",
+    "lose": "Un peldaño cruje y bajáis más rápido de lo que subisteis."
+   },
+   {
+    "label": "Descifrar el código de luces",
+    "test": {
+     "card": "riddle"
+    },
+    "win": "Entendéis los mensajes de las luces y enviáis la señal correcta. Olga os regala su catalejo.",
+    "lose": "Enviáis un mensaje sin sentido. Al otro lado del valle se ríen de vosotros."
+   }
+  ],
+  "reward": {
+   "stars": 3,
+   "xp": 45,
+   "attr": "sabiduria",
+   "relic": "Catalejo de la vigía"
+  }
+ },
+ "campana": {
+  "zone": "Cementerio",
+  "title": "El misterio de la campana robada",
+  "giver": {
+   "name": "Fray Celso, el guardián",
+   "cls": "maga",
+   "color": "#8b5bd6",
+   "aura": "sombra"
+  },
+  "text": "La campana de plata que hace que los esqueletos se vayan a dormir ha desaparecido. Esta noche había tres visitantes en el cementerio: una cómica de teatro, un aprendiz de mago y un vendedor de caramelos. Uno de ellos sabe dónde está. ¡Resolved el misterio!",
+  "choices": [
+   {
+    "label": "Interrogar a los sospechosos",
+    "test": {
+     "card": "logic"
+    },
+    "win": "El aprendiz de mago se pone rojo: se llevó la campana para practicar un hechizo de silencio. La devuelve y pide perdón. ¡Caso cerrado!",
+    "lose": "Los tres sospechosos se acusan entre sí y no sacáis nada en claro."
+   },
+   {
+    "label": "Buscar pistas entre las tumbas",
+    "test": {
+     "card": "skill",
+     "game": "memoria"
+    },
+    "win": "Juntando las pistas iguales aparece un rastro de purpurina mágica que lleva hasta la mochila del aprendiz de mago. ¡Ahí está la campana!",
+    "lose": "Las pistas se mezclan y la niebla lo tapa todo."
+   },
+   {
+    "label": "Seguir el tintineo",
+    "test": {
+     "roll": "suerte",
+     "target": 55
+    },
+    "win": "Un tintineo lejano os guía hasta un árbol hueco: alguien escondió allí la campana. Fray Celso la toca y los esqueletos bostezan.",
+    "lose": "El tintineo era el carro del vendedor de caramelos. Al menos os da uno."
+   }
+  ],
+  "reward": {
+   "stars": 4,
+   "xp": 50,
+   "item": "espada"
+  }
+ },
+ "ermita": {
+  "zone": "Ermita",
+  "title": "La llama de la ermita",
+  "giver": {
+   "name": "Hermana Alba, la guardiana",
+   "cls": "caballero",
+   "color": "#e9a514",
+   "aura": "fuego"
+  },
+  "text": "En esta ermita arde desde hace mil años la Llama Valiente, que protege a los héroes que van a enfrentarse al Dragón. Pero el viento del volcán la ha apagado. Si la encendéis de nuevo, su bendición irá con vosotros.",
+  "choices": [
+   {
+    "label": "Responder al acertijo de la llama",
+    "test": {
+     "card": "riddle"
+    },
+    "win": "Al decir la respuesta correcta, una chispa salta de la piedra y la Llama Valiente vuelve a arder. Os sentís más valientes que nunca.",
+    "lose": "La piedra sigue fría. La respuesta no era esa."
+   },
+   {
+    "label": "Recoger chispas del volcán",
+    "test": {
+     "card": "skill",
+     "game": "atrapa"
+    },
+    "win": "Atrapáis las chispas que vuelan del volcán y con ellas encendéis la llama.",
+    "lose": "Las chispas se escapan entre los dedos y se apagan en el aire."
+   },
+   {
+    "label": "Ofrecer 2 estrellas",
+    "test": {
+     "pay": 2
+    },
+    "win": "Colocáis las estrellas en el altar y brillan tanto que la llama se enciende sola."
+   }
+  ],
+  "reward": {
+   "stars": 2,
+   "xp": 40,
+   "item": "escudo"
+  }
+ },
+ "invierno": {
+  "zone": "Refugio nevado",
+  "title": "El espíritu de la Noche de Invierno",
+  "epic": true,
+  "giver": {
+   "name": "Rufino, el montañero",
+   "cls": "barbaro",
+   "color": "#c8323f",
+   "aura": "hielo"
+  },
+  "chapters": [
+   {
+    "title": "La tormenta",
+    "text": "¡Alto, viajeros! Esta noche es la Noche de Invierno, la más larga del año, y se acerca una tormenta de nieve terrible. Hay un refugio en lo alto del paso, donde la familia Velasco celebra el gran banquete. ¡Tenemos que llegar antes de que la nieve lo tape todo!",
+    "choices": [
+     {
+      "label": "Seguir el mapa del montañero",
+      "test": {
+       "card": "skill",
+       "game": "laberinto"
+      },
+      "win": "Entre la ventisca distinguís una lucecita: ¡el refugio! La familia Velasco os abre la puerta y os da sopa caliente.",
+      "lose": "La nieve borra el camino y tenéis que volver atrás a calentaros."
+     },
+     {
+      "label": "Calcular la ruta más corta",
+      "test": {
+       "card": "math"
+      },
+      "win": "Vuestras cuentas aciertan: atajáis por el puente helado y llegáis al refugio antes de la tormenta.",
+      "lose": "Un número mal sumado y acabáis dando vueltas alrededor del mismo pino."
+     },
+     {
+      "label": "Aguantar el frío",
+      "test": {
+       "roll": "fuerza",
+       "target": 55
+      },
+      "win": "Con la nieve hasta las rodillas, paso a paso, llegáis al refugio. ¡Qué valientes!",
+      "lose": "El viento sopla tan fuerte que os empuja montaña abajo."
+     }
+    ]
+   },
+   {
+    "title": "El fantasma gruñón",
+    "giver": {
+     "name": "El fantasma del abuelo Tobías",
+     "cls": "caballero",
+     "color": "#a9d8ff",
+     "aura": "hielo"
+    },
+    "text": "¡PUM! ¡PAM! Las puertas del refugio se cierran solas y el tronco de la chimenea casi se apaga. Es el fantasma del abuelo Tobías, el antiguo dueño. Está enfadadísimo: grita que alguien ha encerrado a su nieta en la bodega. ¡Calmadlo antes de que el fuego se apague!",
+    "choices": [
+     {
+      "label": "Hablar con el fantasma",
+      "test": {
+       "card": "riddle"
+      },
+      "win": "El fantasma escucha vuestra respuesta, se rasca la barba transparente y se calma: «Está bien… bajad a la bodega y averiguad la verdad».",
+      "lose": "«¡No me entendéis!», brama el fantasma, y una corriente helada os echa a la calle."
+     },
+     {
+      "label": "Buscar pistas en el refugio",
+      "test": {
+       "card": "skill",
+       "game": "memoria"
+      },
+      "win": "Las pistas encajan: unas huellas pequeñitas, migas de tarta y una llave que solo abre la bodega. ¡El misterio está ahí abajo!",
+      "lose": "Las pistas se mezclan y el fantasma os tira un cojín."
+     },
+     {
+      "label": "Mantener vivo el tronco",
+      "test": {
+       "roll": "suerte",
+       "target": 55
+      },
+      "win": "Avivas el fuego justo a tiempo. El fantasma se calienta las manos y sonríe por primera vez en años.",
+      "lose": "El fuego se apaga, todo se queda a oscuras… y el fantasma se ríe muy alto."
+     }
+    ]
+   },
+   {
+    "title": "El secreto de la bodega",
+    "giver": {
+     "name": "Lucía, la nieta invisible",
+     "cls": "maga",
+     "color": "#e05c9b",
+     "aura": "sombra"
+    },
+    "text": "En la bodega encontráis a Lucía, la nieta… ¡pero es invisible! Un hada de la nieve le hizo una broma y se ha escondido de vergüenza. Además, un goblin con gorro rojo se está comiendo todo el banquete de la fiesta. ¡Salvad la Noche de Invierno!",
+    "choices": [
+     {
+      "label": "Deshacer el hechizo",
+      "test": {
+       "card": "skill",
+       "game": "simon"
+      },
+      "win": "Repetís la canción del hada sin fallar y Lucía vuelve a verse. Su abuelo fantasma la abraza y por fin descansa feliz.",
+      "lose": "La canción sale mal y Lucía se vuelve… ¡de color verde!"
+     },
+     {
+      "label": "Engañar al goblin glotón",
+      "test": {
+       "card": "logic"
+      },
+      "win": "Con un plan muy listo, el goblin cae en la trampa del pastel y promete portarse bien. Lucía se ríe tanto que el hechizo se rompe.",
+      "lose": "El goblin se escapa con una pierna de pavo y una carcajada."
+     },
+     {
+      "label": "Invitar al goblin al banquete",
+      "test": {
+       "pay": 2
+      },
+      "win": "Le ofrecéis un sitio en la mesa. El goblin, emocionado, devuelve la comida y Lucía, al ver tanta alegría, vuelve a hacerse visible."
+     }
+    ]
+   }
+  ],
+  "reward": {
+   "stars": 5,
+   "xp": 60,
+   "item": "trucado",
+   "attr": "sabiduria",
+   "relic": "Tronco de la Noche de Invierno"
+  }
+ }
+}

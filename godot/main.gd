@@ -20,8 +20,16 @@ const MINI := {
 	"esbirro": {"name": "Esqueleto Esbirro", "hp": 2, "model": "Skeleton_Minion", "node": Vector2i(-6, 0), "hex": Vector2i(-6, -1), "atk": "Unarmed_Melee_Attack_Punch_A"},
 	"picaro": {"name": "Esqueleto Pícaro", "hp": 3, "model": "Skeleton_Rogue", "node": Vector2i(-2, 2), "hex": Vector2i(-2, 1), "atk": "1H_Melee_Attack_Chop"},
 	"mago": {"name": "Esqueleto Mago", "hp": 3, "model": "Skeleton_Mage", "node": Vector2i(1, -2), "hex": Vector2i(2, -2), "atk": "Spellcast_Shoot"},
-	"guerrero": {"name": "Esqueleto Guerrero", "hp": 4, "model": "Skeleton_Warrior", "node": Vector2i(4, 0), "hex": Vector2i(5, -1), "atk": "1H_Melee_Attack_Chop"},
+	"guerrero": {"name": "Esqueleto Guerrero", "hp": 4, "model": "Skeleton_Warrior", "node": Vector2i(2, 0), "hex": Vector2i(2, 1), "atk": "1H_Melee_Attack_Chop"},
 }
+const QUEST_SPOTS := {
+	"granja": {"node": Vector2i(-3, 2), "npc": Vector2i(-4, 2), "model": "Barbarian", "show": ["Barbarian_Hat"], "tint": Color(0.85, 1.0, 0.8)},
+	"invierno": {"node": Vector2i(1, -1), "npc": Vector2i(2, -1), "model": "Barbarian", "show": ["Barbarian_Hat", "Barbarian_Cape"], "tint": Color(1.0, 0.85, 0.85)},
+	"ermita": {"node": Vector2i(4, 0), "npc": Vector2i(4, 1), "model": "Knight", "show": ["Knight_Cape", "Badge_Shield"], "tint": Color(1.2, 1.05, 0.7)},
+}
+const ATTR_NAME := {"fuerza": "Fuerza", "sabiduria": "Sabiduría", "suerte": "Suerte"}
+const ITEM_NAME := {"pista": "Pista", "reloj": "Reloj de arena", "doble": "Dado doble", "escudo": "Escudo", "portal": "Portal", "trucado": "Dado trucado", "espada": "Espada de fuego"}
+const GAME_FOR := {"laberinto": "memoria", "minas": "faroles", "deslizante": "simon", "atrapa": "simon", "memoria": "memoria", "simon": "simon", "faroles": "faroles"}
 const TIERS := [[25, 0, 1], [55, 1, 2], [85, 2, 3], [100, 3, 4]]
 const ACCESSORY := ["Sword", "Shield", "Axe", "Mug", "Spellbook", "Wand", "Staff", "Crossbow", "Knife", "Throwable", "Helmet", "Hat", "Cape"]
 const HX := 2.0
@@ -86,6 +94,16 @@ var bank := {}
 var decks := {}
 var level := 2
 var stars := 0
+var quests := {}
+var quests_done := {}
+var qprog := {}
+var items: Array = []
+var relics: Array = []
+var attrs := {"fuerza": 0, "sabiduria": 0, "suerte": 0}
+var chest_opened := false
+var questbox: Control
+var btn_exit: Button
+var npcs := {}
 var rolls_used := 0
 var last_roll := 0
 var trail: Array = []
@@ -124,12 +142,14 @@ func _ready() -> void:
 	world_env = WorldEnvironment.new()
 	add_child(world_env)
 	bank = JSON.parse_string(FileAccess.get_file_as_string("res://data/preguntas.json"))
+	quests = JSON.parse_string(FileAccess.get_file_as_string("res://data/misiones.json"))
 	build_path()
 	build_board()
 	build_bosses()
 	build_minis()
 	build_tavern()
 	build_dungeon()
+	build_npcs()
 	build_ui()
 	set_mode("board")
 	await use_hero(HEROES[0])
@@ -240,7 +260,7 @@ func build_path() -> void:
 	for a in [[-7, 0, "start"], [-6, 0, "riddle"], [-5, 0, "tavern"], [-4, 0, "boss"], [-3, 0, "fork"]]:
 		main.append(add_node(a[0], a[1], a[2]))
 	var A := []
-	for a in [[-2, -1, "logic"], [-1, -2, "star"], [0, -2, "dungeon"], [1, -2, "skill"], [1, -1, "riddle"]]:
+	for a in [[-2, -1, "logic"], [-1, -2, "star"], [0, -2, "dungeon"], [1, -2, "skill"], [1, -1, "quest"]]:
 		A.append(add_node(a[0], a[1], a[2], "A"))
 	var B := []
 	for a in [[-3, 1, "star"], [-3, 2, "quest"], [-2, 2, "math"], [-1, 2, "logic"], [0, 1, "skill"]]:
@@ -430,7 +450,7 @@ func build_board() -> void:
 		ic.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		ic.position = n["p"] + Vector3(0, 0.95, 0)
 		root.add_child(ic)
-		markers.append({"ring": m, "ic": ic, "base": n["p"]})
+		markers.append({"ring": m, "ic": ic, "base": n["p"], "node": n})
 
 	place_label(root, "Posada del Grifo", tavern_pos + Vector3(0, 2.5, 0))
 	place_label(root, "Mina de las Runas", mine_pos + Vector3(0, 2.6, 0))
@@ -1135,6 +1155,168 @@ func victory() -> void:
 	say("¡Habéis vencido al Dragón Carmesí y salvado el reino! Total: %d estrellas." % stars)
 	offer("Jugar otra vez", func(): get_tree().reload_current_scene())
 
+
+# ---------------------------------------------------------------- quests
+func quest_at(n: int) -> String:
+	for id in QUEST_SPOTS:
+		var spot: Vector2i = QUEST_SPOTS[id]["node"]
+		if path_nodes[n]["q"] == spot.x and path_nodes[n]["r"] == spot.y:
+			return id
+	return ""
+
+
+func npc(parent: Node3D, model: String, show: Array, tint: Color, pos: Vector3, look_at: Vector3, sc: float, name: String) -> Node3D:
+	var m: Node3D = load_hero({"id": model, "show": show})
+	tint_model(m, tint)
+	m.position = pos
+	m.scale = Vector3.ONE * sc
+	m.rotation.y = atan2(look_at.x - pos.x, look_at.z - pos.z)
+	parent.add_child(m)
+	var a: AnimationPlayer = m.find_children("*", "AnimationPlayer", true, false)[0]
+	a.get_animation("Idle").loop_mode = Animation.LOOP_LINEAR
+	a.play("Idle")
+	var l := Label3D.new()
+	l.text = "!  " + name
+	l.font = font_head
+	l.font_size = 36
+	l.pixel_size = 0.008 if sc < 0.6 else 0.012
+	l.outline_size = 12
+	l.outline_modulate = Color(0.1, 0.05, 0.0)
+	l.modulate = Color("ffd27a")
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.position = pos + Vector3(0, 2.4 * sc / 0.52 * 0.55 + 0.4, 0)
+	parent.add_child(l)
+	m.set_meta("label", l)
+	return m
+
+
+func build_npcs() -> void:
+	for id in QUEST_SPOTS:
+		var spot: Dictionary = QUEST_SPOTS[id]
+		var giver: Dictionary = quests[id]["giver"]
+		var node_p := hpos(spot["node"].x, spot["node"].y)
+		npcs[id] = npc(roots["board"], spot["model"], spot["show"], spot["tint"], hpos(spot["npc"].x, spot["npc"].y), node_p, 0.5, giver["name"].split(",")[0])
+	npcs["posada"] = npc(roots["tavern"], "Barbarian", ["Mug", "Barbarian_Cape"], Color(1.15, 0.95, 0.85), Vector3(1.5, 0, -3.6), Vector3(0, 0, 2), 0.72, "Doña Petra")
+	var bru := npc(roots["dungeon"], "Barbarian", ["1H_Axe", "Barbarian_Hat"], Color(1.0, 0.9, 0.7), Vector3(-3.2, 0, 1.5), Vector3(0, 0, 4.6), 0.72, "Brunilda")
+	bru.scale = Vector3(0.8, 0.62, 0.8)
+	npcs["mina"] = bru
+
+
+func test_label(t: Dictionary) -> String:
+	if t.has("pay"):
+		return "Pagar %d ★" % t["pay"]
+	if t.has("roll"):
+		return "Tirada de %s: %d+ (bono +%d)" % [ATTR_NAME[t["roll"]], t["target"], 10 + attrs[t["roll"]] * 10]
+	if t.has("game"):
+		return "Reto de habilidad"
+	return {"riddle": "Adivinanza", "logic": "Acertijo", "math": "Problema", "skill": "Reto de habilidad"}[t["card"]]
+
+
+func reward_text(rw: Dictionary) -> String:
+	var parts := ["%d ★" % rw["stars"]]
+	if rw.has("item"):
+		parts.append(ITEM_NAME[rw["item"]])
+	if rw.has("attr"):
+		parts.append("+1 de %s" % ATTR_NAME[rw["attr"]])
+	return "Recompensa: " + ", ".join(parts) + "."
+
+
+func run_quest(id: String) -> void:
+	busy = true
+	btn_act.disabled = true
+	var q: Dictionary = quests[id]
+	var chapters: Array = q.get("chapters", [])
+	while true:
+		var chap: int = qprog.get(id, 0)
+		var part: Dictionary = chapters[chap] if chapters.size() > 0 else q
+		var giver: Dictionary = part.get("giver", q["giver"])
+		var zone := "Misión · %s" % q["zone"]
+		if chapters.size() > 0:
+			zone += " · Capítulo %d de %d" % [chap + 1, chapters.size()]
+		var title: String = q["title"] + (": " + part["title"] if chapters.size() > 0 else "")
+		var opts := []
+		for c in part["choices"]:
+			opts.append({"label": c["label"], "test": test_label(c["test"]), "disabled": c["test"].has("pay") and stars < c["test"]["pay"]})
+		var rw_txt := reward_text(q["reward"])
+		if chapters.size() > 0 and chap < chapters.size() - 1:
+			rw_txt = "Cada capítulo superado os acerca al final. " + rw_txt.replace("Recompensa:", "Recompensa final:")
+		questbox.show_intro(zone, title, giver["name"], part["text"], opts, rw_txt)
+		var k: int = await questbox.chosen
+		var ch: Dictionary = part["choices"][k]
+		var t: Dictionary = ch["test"]
+		var ok := false
+		var paid := false
+		var notes := []
+		if t.has("pay"):
+			stars -= int(t["pay"])
+			ok = true
+			paid = true
+		elif t.has("roll"):
+			var v: int = await roll_d100()
+			var bonus: int = 10 + attrs[t["roll"]] * 10
+			ok = v + bonus >= int(t["target"])
+			notes.append("Tirada: %d + %d = %d (necesitabais %d)" % [v, bonus, v + bonus, t["target"]])
+		else:
+			var c := draw(t["card"])
+			if t.has("game"):
+				c["game"] = GAME_FOR.get(t["game"], "memoria")
+			qpanel.open(c, level)
+			ok = await qpanel.finished
+		if ok and chapters.size() > 0 and chap < chapters.size() - 1:
+			qprog[id] = chap + 1
+			notes.append("Capítulo %d superado." % (chap + 1))
+			questbox.show_result(true, "¡Capítulo superado!", ch["win"], notes, "Siguiente capítulo")
+			await questbox.closed
+			continue
+		if ok:
+			var rw: Dictionary = q["reward"]
+			if not paid:
+				stars += int(rw["stars"])
+				notes.append("+%d ★" % rw["stars"])
+			if rw.has("item"):
+				items.append(rw["item"])
+				notes.append("Objeto: %s" % ITEM_NAME[rw["item"]])
+			if rw.has("attr"):
+				attrs[rw["attr"]] += 1
+				relics.append(rw.get("relic", ""))
+				notes.append("%s: +1 de %s" % [rw.get("relic", "Reliquia"), ATTR_NAME[rw["attr"]]])
+			quests_done[id] = true
+			quest_done_fx(id)
+			play("Cheer")
+		else:
+			notes.append("La misión sigue pendiente: podéis volver a intentarlo.")
+			if chapters.size() > 0:
+				notes.append("No perdéis los capítulos ya superados.")
+		update_stats()
+		questbox.show_result(ok, "¡Misión cumplida!" if ok else "No ha salido bien", ch["win"] if ok else ch.get("lose", ""), notes, "Continuar")
+		await questbox.closed
+		break
+	busy = false
+	btn_act.disabled = false
+	play("Idle")
+	if mode == "board":
+		rolls_used = 0
+		update_stats()
+		offer()
+		say("¡Misión cumplida! Tira el dado." if quests_done.has(id) else "Turno nuevo. ¡Tira el dado!")
+	else:
+		interior_offer()
+
+
+func quest_done_fx(id: String) -> void:
+	if npcs.has(id):
+		var l: Label3D = npcs[id].get_meta("label")
+		l.text = l.text.replace("!  ", "✓  ")
+		l.modulate = Color("4fd18b")
+	if QUEST_SPOTS.has(id):
+		var spot: Vector2i = QUEST_SPOTS[id]["node"]
+		for m in markers:
+			if m["node"]["q"] == spot.x and m["node"]["r"] == spot.y:
+				m["ring"].albedo_color = Color("6b6f80")
+				m["ring"].emission = Color("6b6f80")
+				m["ic"].text = "✓"
+
 # ---------------------------------------------------------------- hero
 func load_hero(def: Dictionary) -> Node3D:
 	var path := "res://assets/heroes/%s.glb" % def["id"]
@@ -1354,6 +1536,13 @@ func landed(n: int) -> void:
 			busy = false
 			btn_act.disabled = false
 			after_question(good)
+		"quest":
+			var qid := quest_at(n)
+			if qid != "" and not quests_done.has(qid):
+				await run_quest(qid)
+			else:
+				say("Aquí ya no queda nada por hacer.")
+				end_turn_or_continue()
 		"star":
 			stars += 1
 			play("Cheer")
@@ -1472,12 +1661,27 @@ func enter(where: String) -> void:
 	await walk_to(sp["to"], 1.4)
 	play("Idle")
 	busy = false
-	if where == "tavern":
-		say("La Posada del Grifo huele a pan caliente y a tarta. Aquí descansaréis, compraréis y aceptaréis misiones.")
-		offer("Salir", leave)
-	else:
-		say("La mazmorra de la mina. Al fondo brilla un cofre dorado…")
-		offer("Abrir el cofre", open_chest)
+	btn_exit.visible = true
+	interior_offer()
+
+
+func interior_offer() -> void:
+	if mode == "tavern":
+		if not quests_done.has("posada"):
+			say("La Posada del Grifo huele a pan caliente… pero Doña Petra parece preocupada.")
+			offer("Hablar con Doña Petra", run_quest.bind("posada"))
+		else:
+			say("La Posada del Grifo está tranquila. Doña Petra os sirve tarta gratis.")
+			offer("Salir", leave)
+	elif mode == "dungeon":
+		if not quests_done.has("mina"):
+			say("En la mazmorra os espera Brunilda, la enana minera, frente a una puerta con runas.")
+			offer("Hablar con Brunilda", run_quest.bind("mina"))
+		elif not chest_opened:
+			say("La puerta de las runas está abierta. Al fondo brilla un cofre dorado…")
+			offer("Abrir el cofre", open_chest)
+		else:
+			offer("Salir", leave)
 
 
 func open_chest() -> void:
@@ -1491,7 +1695,10 @@ func open_chest() -> void:
 	coins(chest.position + Vector3(0, 1.6, 0))
 	await get_tree().create_timer(0.5).timeout
 	play("Cheer")
-	say("¡Tesoro! Has encontrado 5 estrellas y una llave rúnica.")
+	chest_opened = true
+	stars += 5
+	update_stats()
+	say("¡Tesoro! Has encontrado 5 estrellas.")
 	await get_tree().create_timer(1.6).timeout
 	play("Idle")
 	busy = false
@@ -1547,6 +1754,7 @@ func leave() -> void:
 	pitch = 0.95
 	dist_goal = 15.0
 	box_visit.visible = true
+	btn_exit.visible = false
 	await fade_to(0.0)
 	play("Idle")
 	busy = false
@@ -1596,6 +1804,9 @@ func _unhandled_input(e: InputEvent) -> void:
 	# testing shortcuts on a keyboard: 1 riddle, 2 logic, 3 problem, 4-6 skill games
 	if e is InputEventKey and e.pressed and not busy and mode == "board":
 		var k: int = e.keycode - KEY_1
+		if k == 8:
+			run_quest("invierno")
+			return
 		if k == 7:
 			for id in MINI:
 				if bosses[id]["hp"] > 0:
@@ -1610,7 +1821,7 @@ func _unhandled_input(e: InputEvent) -> void:
 					hero.position = path_nodes[hero_at]["p"]
 					boss_fight(id)
 					return
-		if k >= 0 and k <= 5:
+		if k >= 0 and k <= 5 and not busy:
 			busy = true
 			var c := draw(["riddle", "logic", "math", "skill", "skill", "skill"][k])
 			if k >= 3:
@@ -1832,9 +2043,24 @@ func build_ui() -> void:
 		pc.add_child(l)
 		d100.add_child(pc)
 
+	btn_exit = Button.new()
+	btn_exit.text = "Salir"
+	btn_exit.custom_minimum_size = Vector2(150, 56)
+	btn_exit.add_theme_font_size_override("font_size", 22)
+	btn_exit.visible = false
+	btn_exit.pressed.connect(func():
+		if not busy:
+			offer()
+			leave())
+	ui.add_child(btn_exit)
+
 	qpanel = preload("res://question_panel.gd").new()
 	ui.add_child(qpanel)
 	qpanel.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
+	questbox = preload("res://quest_box.gd").new()
+	ui.add_child(questbox)
+	questbox.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
+	ui.move_child(qpanel, -1)
 
 	fade = ColorRect.new()
 	fade.color = Color(0, 0, 0, 0)
@@ -1853,6 +2079,8 @@ func _on_resize() -> void:
 	lbl_dice.pivot_offset = sz * 0.5
 	picker.reset_size()
 	picker.position = Vector2(sz.x - picker.size.x - m, 18)
+	btn_exit.reset_size()
+	btn_exit.position = Vector2(m, sz.y - btn_exit.size.y - m)
 	box_visit.reset_size()
 	box_visit.position = Vector2(m, sz.y - box_visit.size.y - m)
 	btn_act.reset_size()

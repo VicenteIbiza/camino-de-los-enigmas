@@ -16,6 +16,12 @@ const BOSS := {
 	"golem": {"name": "Gólem de Cristal", "hp": 7, "model": "Knight", "show": ["2H_Sword", "Knight_Helmet"], "tint": Color(0.55, 0.85, 1.35), "hex": Vector2i(3, -1), "scale": 1.35},
 	"dragon": {"name": "Dragón Carmesí", "hp": 10, "model": "", "hex": Vector2i(6, 0), "scale": 1.0},
 }
+const MINI := {
+	"esbirro": {"name": "Esqueleto Esbirro", "hp": 2, "model": "Skeleton_Minion", "node": Vector2i(-6, 0), "hex": Vector2i(-6, -1), "atk": "Unarmed_Melee_Attack_Punch_A"},
+	"picaro": {"name": "Esqueleto Pícaro", "hp": 3, "model": "Skeleton_Rogue", "node": Vector2i(-2, 2), "hex": Vector2i(-2, 1), "atk": "1H_Melee_Attack_Chop"},
+	"mago": {"name": "Esqueleto Mago", "hp": 3, "model": "Skeleton_Mage", "node": Vector2i(1, -2), "hex": Vector2i(2, -2), "atk": "Spellcast_Shoot"},
+	"guerrero": {"name": "Esqueleto Guerrero", "hp": 4, "model": "Skeleton_Warrior", "node": Vector2i(4, 0), "hex": Vector2i(5, -1), "atk": "1H_Melee_Attack_Chop"},
+}
 const TIERS := [[25, 0, 1], [55, 1, 2], [85, 2, 3], [100, 3, 4]]
 const ACCESSORY := ["Sword", "Shield", "Axe", "Mug", "Spellbook", "Wand", "Staff", "Crossbow", "Knife", "Throwable", "Helmet", "Hat", "Cape"]
 const HX := 2.0
@@ -121,6 +127,7 @@ func _ready() -> void:
 	build_path()
 	build_board()
 	build_bosses()
+	build_minis()
 	build_tavern()
 	build_dungeon()
 	build_ui()
@@ -328,7 +335,7 @@ func build_board() -> void:
 	place.call("target", 4, 1, -0.9, 1.1)
 	place.call("building_grain", -6, 2, 0.3, 1.0)
 	place.call("building_grain", -5, 2, 1.4, 1.0)
-	for b in BOSS.values():
+	for b in BOSS.values() + MINI.values():
 		occupied[key(b["hex"].x, b["hex"].y)] = true
 
 	var water := {"-1,0": true, "0,-1": true, "-1,1": true, "0,0": true}
@@ -717,6 +724,136 @@ func boss_alive(n: int) -> bool:
 	return path_nodes[n].has("boss") and bosses[path_nodes[n]["boss"]]["hp"] > 0
 
 
+func mini_alive(n: int) -> bool:
+	return path_nodes[n].has("mini") and bosses[path_nodes[n]["mini"]]["hp"] > 0
+
+
+func foe_name(id: String) -> String:
+	return BOSS[id]["name"] if BOSS.has(id) else MINI[id]["name"]
+
+
+func build_minis() -> void:
+	for id in MINI:
+		var m: Dictionary = MINI[id]
+		var node := -1
+		for i in path_nodes.size():
+			if path_nodes[i]["q"] == m["node"].x and path_nodes[i]["r"] == m["node"].y:
+				node = i
+		path_nodes[node]["mini"] = id
+		var model: Node3D = scene("res://assets/minis/%s.glb" % m["model"]).instantiate()
+		var anim: AnimationPlayer = model.find_children("*", "AnimationPlayer", true, false)[0]
+		if anim.has_animation("Idle"):
+			anim.get_animation("Idle").loop_mode = Animation.LOOP_LINEAR
+		var pos := hpos(m["hex"].x, m["hex"].y)
+		model.position = pos
+		model.scale = Vector3.ONE * 0.62
+		var tgt: Vector3 = path_nodes[node]["p"]
+		model.rotation.y = atan2(tgt.x - pos.x, tgt.z - pos.z)
+		model.visible = false
+		roots["board"].add_child(model)
+		var lbl := Label3D.new()
+		lbl.font = font_head
+		lbl.font_size = 36
+		lbl.pixel_size = 0.008
+		lbl.outline_size = 12
+		lbl.outline_modulate = Color(0.06, 0.02, 0.1)
+		lbl.modulate = Color("d4b4ff")
+		lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		lbl.no_depth_test = true
+		lbl.position = pos + Vector3(0, 2.0, 0)
+		lbl.visible = false
+		roots["board"].add_child(lbl)
+		bosses[id] = {"node": node, "hp": m["hp"], "max": m["hp"], "model": model, "anim": anim, "label": lbl, "home": pos, "mini": true, "awake": false}
+		boss_label(id)
+
+
+func reveal_mini(id: String) -> void:
+	var b: Dictionary = bosses[id]
+	if b["awake"]:
+		return
+	b["awake"] = true
+	b["model"].visible = true
+	b["label"].visible = true
+	burst(b["home"] + Vector3(0, 0.4, 0), Color("b48cff"))
+	boss_anim(id, "Spawn_Ground_Skeletons")
+	await get_tree().create_timer(1.6).timeout
+	boss_anim(id, "Idle")
+
+
+func burst(at: Vector3, c: Color) -> void:
+	var p := CPUParticles3D.new()
+	p.one_shot = true
+	p.amount = 36
+	p.lifetime = 1.0
+	p.explosiveness = 0.9
+	p.position = at
+	p.direction = Vector3.UP
+	p.spread = 70.0
+	p.initial_velocity_min = 1.5
+	p.initial_velocity_max = 3.5
+	p.gravity = Vector3(0, -3, 0)
+	var q := QuadMesh.new()
+	q.size = Vector2(0.25, 0.25)
+	var m := glow_material(c * Color(1.8, 1.8, 1.8, 1))
+	m.albedo_texture = soft_dot()
+	q.material = m
+	p.mesh = q
+	roots["board"].add_child(p)
+	p.emitting = true
+	get_tree().create_timer(1.8).timeout.connect(p.queue_free)
+
+
+func mini_curse(id: String) -> String:
+	var b: Dictionary = bosses[id]
+	var was_hidden: bool = not b["awake"]
+	await reveal_mini(id)
+	boss_anim(id, "Spellcast_Summon")
+	say("%s%s despierta al verte pasar y lanza una maldición. Tira el dado…" % ["¡Un minijefe oculto! " if was_hidden else "", foe_name(id)])
+	await get_tree().create_timer(1.0).timeout
+	var v := randi_range(1, 6)
+	lbl_dice.visible = true
+	for k in 10:
+		lbl_dice.text = str(randi_range(1, 6))
+		await get_tree().create_timer(0.055).timeout
+	lbl_dice.text = str(v)
+	await get_tree().create_timer(0.7).timeout
+	lbl_dice.visible = false
+	var out := "stay"
+	var txt := ""
+	if v <= 2:
+		if stars > 0:
+			stars -= 1
+			txt = "te roba 1 estrella."
+		else:
+			txt = "quería robarte una estrella, pero no tienes. Se ríe de ti."
+		play("Hit_A")
+	elif v <= 4:
+		txt = "te empuja 2 casillas atrás y se acaba tu turno."
+		out = "push"
+	elif v == 5:
+		txt = "te congela: te quedas aquí."
+		out = "stop"
+	else:
+		stars += 1
+		txt = "¡le caes bien! Te regala 1 estrella."
+		play("Cheer")
+	boss_anim(id, "Taunt" if v < 6 else "Cheer")
+	burst(hero.position + Vector3(0, 1.0, 0), Color("ffd84a") if v == 6 else Color("b48cff"))
+	update_stats()
+	say("%s · dado %d: %s" % [foe_name(id), v, txt])
+	await get_tree().create_timer(1.4).timeout
+	boss_anim(id, "Idle")
+	if out == "push":
+		for i in 2:
+			if trail.is_empty():
+				break
+			var back: int = trail.pop_back()
+			await walk_to(path_nodes[back]["p"], 0.38)
+			hero_at = back
+		play("Idle")
+	return out
+
+
 func tint_model(root: Node, tint: Color, glow := false) -> void:
 	for mi in root.find_children("*", "MeshInstance3D", true, false):
 		for i in mi.mesh.get_surface_count():
@@ -865,7 +1002,7 @@ func boss_label(id: String) -> void:
 	var hearts := ""
 	for i in b["max"]:
 		hearts += "♥" if i < b["hp"] else "♡"
-	b["label"].text = "%s\n%s" % [BOSS[id]["name"], hearts]
+	b["label"].text = "%s\n%s" % [foe_name(id), hearts]
 
 
 func boss_anim(id: String, n: String) -> void:
@@ -902,8 +1039,9 @@ func boss_fight(id: String) -> void:
 	btn_act.disabled = true
 	var b: Dictionary = bosses[id]
 	hero_yaw_goal = atan2(b["home"].x - hero.position.x, b["home"].z - hero.position.z)
-	boss_anim(id, "Cheer")
-	say("¡%s te cierra el paso! Los dados de porcentaje deciden el desafío…" % BOSS[id]["name"])
+	var is_mini: bool = b.get("mini", false)
+	boss_anim(id, "Taunt" if is_mini else "Cheer")
+	say(("¡%s te reta a un duelo! " if is_mini else "¡%s te cierra el paso! ") % foe_name(id) + "Los dados de porcentaje deciden el desafío…")
 	await get_tree().create_timer(1.0).timeout
 	var v: int = await roll_d100()
 	var tier: Array = TIERS[3]
@@ -929,16 +1067,19 @@ func boss_fight(id: String) -> void:
 		if b["hp"] == 0:
 			await boss_defeated(id)
 			return
-		say("¡Golpe! %s pierde %d %s; le quedan %d." % [BOSS[id]["name"], dmg, "corazón" if dmg == 1 else "corazones", b["hp"]])
+		say("¡Golpe! %s pierde %d %s; le quedan %d." % [foe_name(id), dmg, "corazón" if dmg == 1 else "corazones", b["hp"]])
 		busy = false
 		btn_act.disabled = false
 		rolls_used = 0
 		update_stats()
 		offer("Atacar otra vez", boss_fight.bind(id))
 		return
-	boss_anim(id, "2H_Melee_Attack_Chop")
+	boss_anim(id, MINI[id]["atk"] if is_mini else "2H_Melee_Attack_Chop")
 	await get_tree().create_timer(0.5).timeout
 	play("Hit_A")
+	if is_mini and stars > 0:
+		stars -= 1
+		update_stats()
 	busy = false
 	btn_act.disabled = false
 	after_question(false)
@@ -966,10 +1107,11 @@ func damage_pop(at: Vector3, txt: String) -> void:
 
 func boss_defeated(id: String) -> void:
 	var b: Dictionary = bosses[id]
-	boss_anim(id, "Death_A")
-	stars += 3
+	var reward := 2 if b.get("mini", false) else 3
+	boss_anim(id, "Death_C_Skeletons" if b.get("mini", false) else "Death_A")
+	stars += reward
 	update_stats()
-	say("¡Has vencido a %s! +3 estrellas." % BOSS[id]["name"])
+	say("¡Has vencido a %s! +%d estrellas." % [foe_name(id), reward])
 	play("Cheer")
 	await get_tree().create_timer(1.4).timeout
 	var tw := create_tween()
@@ -1165,6 +1307,17 @@ func roll_dice() -> void:
 		hero_at = n
 		if boss_alive(n):
 			break
+		if s < v - 1 and mini_alive(n):
+			var res: String = await mini_curse(path_nodes[n]["mini"])
+			if res == "push":
+				busy = false
+				btn_act.disabled = false
+				rolls_used = 0
+				update_stats()
+				offer()
+				return
+			if res == "stop":
+				break
 	play("Idle")
 	busy = false
 	btn_act.disabled = false
@@ -1172,6 +1325,13 @@ func roll_dice() -> void:
 
 
 func landed(n: int) -> void:
+	if mini_alive(n):
+		var id: String = path_nodes[n]["mini"]
+		if not bosses[id]["awake"]:
+			say("¡Sorpresa! Esta casilla escondía a %s." % foe_name(id))
+			await reveal_mini(id)
+		await boss_fight(id)
+		return
 	var t: String = path_nodes[n]["type"]
 	match t:
 		"tavern":
@@ -1436,6 +1596,13 @@ func _unhandled_input(e: InputEvent) -> void:
 	# testing shortcuts on a keyboard: 1 riddle, 2 logic, 3 problem, 4-6 skill games
 	if e is InputEventKey and e.pressed and not busy and mode == "board":
 		var k: int = e.keycode - KEY_1
+		if k == 7:
+			for id in MINI:
+				if bosses[id]["hp"] > 0:
+					hero_at = bosses[id]["node"]
+					hero.position = path_nodes[hero_at]["p"]
+					landed(hero_at)
+					return
 		if k == 6:
 			for id in bosses:
 				if bosses[id]["hp"] > 0:
@@ -1694,6 +1861,6 @@ func _on_resize() -> void:
 	msg.position = Vector2((sz.x - msg.size.x) * 0.5, sz.y - msg.size.y - 104)
 	d100.reset_size()
 	d100.pivot_offset = d100.size * 0.5
-	d100.position = Vector2((sz.x - d100.size.x) * 0.5, sz.y * 0.32)
+	d100.position = Vector2((sz.x - d100.size.x) * 0.5, sz.y * 0.13)
 	box_choices.reset_size()
 	box_choices.position = (sz - box_choices.size) * 0.5

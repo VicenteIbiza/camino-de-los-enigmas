@@ -8,8 +8,11 @@ config/icon="res://assets/icon/icon_512.png"
 config/description="Juego de tablero cooperativo de acertijos. ES GAMES."
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
-boot_splash/bg_color=Color(0.043, 0.055, 0.122, 1)
-boot_splash/show_image=false
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/show_image=true
+boot_splash/image="res://assets/art/esgames.png"
+boot_splash/fullsize=true
+boot_splash/use_filter=true
 
 [display]
 

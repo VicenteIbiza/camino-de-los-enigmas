@@ -201,6 +201,8 @@ func _ready() -> void:
 	build_npcs()
 	build_ui()
 	set_mode("board")
+	set_hud(false)
+	show_splash()
 	await use_hero(HEROES[0])
 	target = goal
 	show_title()
@@ -796,6 +798,15 @@ func boss_alive(n: int) -> bool:
 
 func mini_alive(n: int) -> bool:
 	return path_nodes[n].has("mini") and bosses[path_nodes[n]["mini"]]["hp"] > 0
+
+
+## The boss or miniboss still standing on square n ("" if none).
+func foe_at(n: int) -> String:
+	if boss_alive(n):
+		return path_nodes[n]["boss"]
+	if mini_alive(n):
+		return path_nodes[n]["mini"]
+	return ""
 
 
 func foe_name(id: String) -> String:
@@ -1704,6 +1715,12 @@ func say(t: String) -> void:
 
 
 func offer(label := "", fn := Callable()) -> void:
+	# a hero who starts the turn in front of a boss or miniboss has to fight it
+	if label == "" and not fn.is_valid() and mode == "board" and not fallen and not path_nodes.is_empty():
+		var foe := foe_at(hero_at)
+		if foe != "":
+			label = "¡A la lucha!"
+			fn = boss_fight.bind(foe)
 	offer_fn = fn
 	btn_act.text = label if label != "" else "Tirar el dado"
 	_on_resize.call_deferred()
@@ -1871,16 +1888,26 @@ func after_question(good: bool, cat := "", xp_wrong := true) -> void:
 		return
 	play("Hit_A")
 	var up := gain_xp(2) if xp_wrong else ""
-	if items.has("escudo") and last_roll > 0:
+	var tried := (" +2 de experiencia por intentarlo." if xp_wrong else "") + up
+	# in front of a boss or miniboss you hold your ground: next turn you face it again
+	var foe := foe_at(hero_at)
+	if foe != "":
+		end_turn("¡Vaya! No retrocedes: sigues frente a %s y en tu próximo turno volverás a luchar.%s" % [foe_name(foe), tried])
+		return
+	var steps := mini(2, trail.size())
+	if steps == 0:
+		end_turn("¡Vaya! Esta vez no ha salido bien.%s" % tried)
+		return
+	if items.has("escudo"):
 		items.erase("escudo")
 		burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
-		end_turn("¡Tu escudo te protege y no retrocedes! +2 de experiencia por intentarlo.%s" % up)
+		end_turn("¡Tu escudo te protege y no retrocedes!%s" % tried)
 		return
-	say(("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"] if last_roll > 0 else "¡Vaya! Esta vez no ha salido bien.") + (" +2 de experiencia por intentarlo." if xp_wrong else "") + up)
+	say("¡Vaya! Retrocedes %d casilla%s.%s" % [steps, "" if steps == 1 else "s", tried])
 	busy = true
 	btn_act.disabled = true
 	await get_tree().create_timer(0.8).timeout
-	for i in last_roll:
+	for i in steps:
 		if trail.is_empty():
 			break
 		var back: int = trail.pop_back()
@@ -1917,7 +1944,8 @@ func end_turn(note := "") -> void:
 	if fallen:
 		await fallen_turn()
 		return
-	say("¡Turno de %s! Tira el dado." % hero_def["name"])
+	var foe := foe_at(hero_at) if mode == "board" else ""
+	say("¡Turno de %s! %s" % [hero_def["name"], "Sigues frente a %s: ¡a la lucha!" % foe_name(foe) if foe != "" else "Tira el dado."])
 	play("Cheer")
 	get_tree().create_timer(1.4).timeout.connect(func(): play("Idle"))
 	offer()
@@ -2565,6 +2593,29 @@ func set_hud(on: bool) -> void:
 	_on_resize.call_deferred()
 
 
+## ES GAMES logo on black, then the title over the board.
+func show_splash() -> void:
+	set_hud(false)
+	var bg := ColorRect.new()
+	bg.color = Color.BLACK
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ui.add_child(bg)
+	var logo := TextureRect.new()
+	logo.texture = load("res://assets/art/esgames.jpg")
+	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	logo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	logo.modulate.a = 0.0
+	bg.add_child(logo)
+	var tw := create_tween()
+	tw.tween_property(logo, "modulate:a", 1.0, 0.8)
+	tw.tween_interval(1.8)
+	tw.tween_property(logo, "modulate:a", 0.0, 0.6)
+	tw.tween_property(bg, "color:a", 0.0, 0.7)
+	await tw.finished
+	bg.queue_free()
+
+
 func show_title() -> void:
 	set_hud(false)
 	cine = true
@@ -2649,13 +2700,20 @@ func build_title() -> void:
 	col.add_theme_constant_override("separation", 14)
 	col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	title_ui.add_child(col)
-	var pre := Label.new()
-	pre.text = "ES GAMES presenta"
-	pre.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	pre.add_theme_font_override("font", font_head)
-	pre.add_theme_font_size_override("font_size", 28)
-	pre.add_theme_color_override("font_color", Color("e9d7b0"))
-	col.add_child(pre)
+	var mark := TextureRect.new()
+	mark.texture = load("res://assets/art/esgames_mark.png")
+	mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	mark.custom_minimum_size = Vector2(220, 110)
+	mark.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var pres := Label.new()
+	pres.text = "presenta"
+	pres.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pres.add_theme_font_override("font", font_head)
+	pres.add_theme_font_size_override("font_size", 24)
+	pres.add_theme_color_override("font_color", Color("e9d7b0"))
+	col.add_child(mark)
+	col.add_child(pres)
 	var t := Label.new()
 	t.text = "El Camino de los Enigmas"
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

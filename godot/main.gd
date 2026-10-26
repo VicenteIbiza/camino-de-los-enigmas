@@ -5,12 +5,18 @@ extends Node3D
 signal branch_chosen(index: int)
 
 const HEROES := [
-	{"id": "Knight", "name": "Auron", "title": "El Caballero", "art": "caballero", "show": ["1H_Sword", "Badge_Shield", "Knight_Helmet", "Knight_Cape"]},
-	{"id": "Barbarian", "name": "Ragnar", "title": "El Bárbaro", "art": "barbaro", "show": ["2H_Axe", "Barbarian_Hat", "Barbarian_Cape"]},
-	{"id": "Mage", "name": "Ignara", "title": "La Archimaga", "art": "maga", "show": ["2H_Staff", "Mage_Hat", "Mage_Cape"]},
-	{"id": "Rogue", "name": "Sylwen", "title": "La Arquera", "art": "arquera", "show": ["1H_Crossbow", "Rogue_Cape"]},
-	{"id": "Rogue_Hooded", "name": "Vex", "title": "El Asesino", "art": "ninja", "show": ["Knife", "Knife_Offhand", "Rogue_Cape"]},
+	{"id": "Knight", "name": "Auron", "title": "El Caballero", "art": "caballero", "show": ["1H_Sword", "Badge_Shield", "Knight_Helmet", "Knight_Cape"], "atk": "1H_Melee_Attack_Chop"},
+	{"id": "Barbarian", "name": "Ragnar", "title": "El Bárbaro", "art": "barbaro", "show": ["2H_Axe", "Barbarian_Hat", "Barbarian_Cape"], "atk": "2H_Melee_Attack_Chop"},
+	{"id": "Mage", "name": "Ignara", "title": "La Archimaga", "art": "maga", "show": ["2H_Staff", "Mage_Hat", "Mage_Cape"], "atk": "Spellcast_Shoot"},
+	{"id": "Rogue", "name": "Sylwen", "title": "La Arquera", "art": "arquera", "show": ["1H_Crossbow", "Rogue_Cape"], "atk": "1H_Ranged_Shoot"},
+	{"id": "Rogue_Hooded", "name": "Vex", "title": "El Asesino", "art": "ninja", "show": ["Knife", "Knife_Offhand", "Rogue_Cape"], "atk": "Dualwield_Melee_Attack_Chop"},
 ]
+const BOSS := {
+	"troll": {"name": "Trol del Puente", "hp": 5, "model": "Barbarian", "show": ["2H_Axe"], "tint": Color(0.55, 1.0, 0.45), "hex": Vector2i(-4, -1), "scale": 1.25},
+	"golem": {"name": "Gólem de Cristal", "hp": 7, "model": "Knight", "show": ["2H_Sword", "Knight_Helmet"], "tint": Color(0.55, 0.85, 1.35), "hex": Vector2i(3, -1), "scale": 1.35},
+	"dragon": {"name": "Dragón Carmesí", "hp": 10, "model": "", "hex": Vector2i(6, 0), "scale": 1.0},
+}
+const TIERS := [[25, 0, 1], [55, 1, 2], [85, 2, 3], [100, 3, 4]]
 const ACCESSORY := ["Sword", "Shield", "Axe", "Mug", "Spellbook", "Wand", "Staff", "Crossbow", "Knife", "Throwable", "Helmet", "Hat", "Cape"]
 const HX := 2.0
 const HZ := 1.7320508
@@ -79,6 +85,8 @@ var last_roll := 0
 var trail: Array = []
 var qpanel: Control
 var lbl_stats: Label
+var bosses := {}
+var d100: HBoxContainer
 
 # UI
 var ui: Control
@@ -112,6 +120,7 @@ func _ready() -> void:
 	bank = JSON.parse_string(FileAccess.get_file_as_string("res://data/preguntas.json"))
 	build_path()
 	build_board()
+	build_bosses()
 	build_tavern()
 	build_dungeon()
 	build_ui()
@@ -221,7 +230,7 @@ func link(list: Array) -> void:
 
 func build_path() -> void:
 	var main := []
-	for a in [[-7, 0, "start"], [-6, 0, "riddle"], [-5, 0, "tavern"], [-4, 0, "math"], [-3, 0, "fork"]]:
+	for a in [[-7, 0, "start"], [-6, 0, "riddle"], [-5, 0, "tavern"], [-4, 0, "boss"], [-3, 0, "fork"]]:
 		main.append(add_node(a[0], a[1], a[2]))
 	var A := []
 	for a in [[-2, -1, "logic"], [-1, -2, "star"], [0, -2, "dungeon"], [1, -2, "skill"], [1, -1, "riddle"]]:
@@ -230,8 +239,11 @@ func build_path() -> void:
 	for a in [[-3, 1, "star"], [-3, 2, "quest"], [-2, 2, "math"], [-1, 2, "logic"], [0, 1, "skill"]]:
 		B.append(add_node(a[0], a[1], a[2], "B"))
 	var tail := []
-	for a in [[1, 0, "riddle"], [2, 0, "star"], [3, 0, "math"], [4, 0, "quest"], [5, 0, "boss"]]:
+	for a in [[1, 0, "riddle"], [2, 0, "star"], [3, 0, "boss"], [4, 0, "quest"], [5, 0, "boss"]]:
 		tail.append(add_node(a[0], a[1], a[2]))
+	path_nodes[main[3]]["boss"] = "troll"
+	path_nodes[tail[2]]["boss"] = "golem"
+	path_nodes[tail[4]]["boss"] = "dragon"
 	link(main)
 	link(A)
 	link(B)
@@ -316,6 +328,8 @@ func build_board() -> void:
 	place.call("target", 4, 1, -0.9, 1.1)
 	place.call("building_grain", -6, 2, 0.3, 1.0)
 	place.call("building_grain", -5, 2, 1.4, 1.0)
+	for b in BOSS.values():
+		occupied[key(b["hex"].x, b["hex"].y)] = true
 
 	var water := {"-1,0": true, "0,-1": true, "-1,1": true, "0,0": true}
 	for r in range(3, 7):
@@ -697,6 +711,288 @@ func set_mode(m: String) -> void:
 	world_env.environment = envs[m]
 
 
+
+# ---------------------------------------------------------------- bosses
+func boss_alive(n: int) -> bool:
+	return path_nodes[n].has("boss") and bosses[path_nodes[n]["boss"]]["hp"] > 0
+
+
+func tint_model(root: Node, tint: Color, glow := false) -> void:
+	for mi in root.find_children("*", "MeshInstance3D", true, false):
+		for i in mi.mesh.get_surface_count():
+			var m: Material = mi.get_active_material(i)
+			if m is StandardMaterial3D:
+				var d: StandardMaterial3D = m.duplicate()
+				d.albedo_color = d.albedo_color * tint
+				if glow:
+					d.emission_enabled = true
+					d.emission = Color(0.2, 0.5, 0.9)
+					d.emission_energy_multiplier = 0.35
+					d.metallic = 0.3
+					d.roughness = 0.25
+				mi.set_surface_override_material(i, d)
+
+
+func make_dragon() -> Node3D:
+	# placeholder dragon built from simple shapes until a real dragon model is added
+	var root := Node3D.new()
+	var red := StandardMaterial3D.new()
+	red.albedo_color = Color("c22f45")
+	red.roughness = 0.6
+	var dark := StandardMaterial3D.new()
+	dark.albedo_color = Color("7a1b26")
+	var gold := StandardMaterial3D.new()
+	gold.albedo_color = Color("f2c14e")
+	gold.metallic = 0.6
+	gold.roughness = 0.3
+	var eye := StandardMaterial3D.new()
+	eye.albedo_color = Color("ffd34a")
+	eye.emission_enabled = true
+	eye.emission = Color("ffb300")
+	eye.emission_energy_multiplier = 3.0
+	var part := func(mesh: Mesh, mat: Material, pos: Vector3, rot: Vector3, parent: Node3D) -> MeshInstance3D:
+		var mi := MeshInstance3D.new()
+		mi.mesh = mesh
+		mi.material_override = mat
+		mi.position = pos
+		mi.rotation = rot
+		parent.add_child(mi)
+		return mi
+	var body := CapsuleMesh.new()
+	body.radius = 0.55
+	body.height = 1.9
+	part.call(body, red, Vector3(0, 1.0, 0), Vector3(PI / 2, 0, 0), root)
+	var belly := CapsuleMesh.new()
+	belly.radius = 0.42
+	belly.height = 1.5
+	part.call(belly, gold, Vector3(0, 0.85, 0.12), Vector3(PI / 2, 0, 0), root)
+	var neck := CylinderMesh.new()
+	neck.top_radius = 0.22
+	neck.bottom_radius = 0.34
+	neck.height = 1.1
+	part.call(neck, red, Vector3(0, 1.75, 0.75), Vector3(-0.6, 0, 0), root)
+	var head := BoxMesh.new()
+	head.size = Vector3(0.62, 0.48, 0.8)
+	part.call(head, red, Vector3(0, 2.25, 1.15), Vector3.ZERO, root)
+	var snout := BoxMesh.new()
+	snout.size = Vector3(0.46, 0.28, 0.5)
+	part.call(snout, dark, Vector3(0, 2.12, 1.6), Vector3.ZERO, root)
+	var horn := CylinderMesh.new()
+	horn.top_radius = 0.0
+	horn.bottom_radius = 0.09
+	horn.height = 0.55
+	for sx in [-1, 1]:
+		part.call(horn, gold, Vector3(0.2 * sx, 2.62, 0.95), Vector3(-0.6, 0, 0.3 * sx), root)
+		var e := SphereMesh.new()
+		e.radius = 0.07
+		e.height = 0.14
+		part.call(e, eye, Vector3(0.24 * sx, 2.36, 1.48), Vector3.ZERO, root)
+		var leg := CylinderMesh.new()
+		leg.top_radius = 0.16
+		leg.bottom_radius = 0.2
+		leg.height = 0.8
+		part.call(leg, red, Vector3(0.38 * sx, 0.4, 0.5), Vector3.ZERO, root)
+		part.call(leg, red, Vector3(0.38 * sx, 0.4, -0.5), Vector3.ZERO, root)
+		# wing: a flat triangle fan, double sided
+		var pivot := Node3D.new()
+		pivot.position = Vector3(0.35 * sx, 1.45, -0.1)
+		root.add_child(pivot)
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var pts := [Vector3(0, 0, 0.5), Vector3(1.9 * sx, 0.9, 0.2), Vector3(1.7 * sx, 0.2, -0.4), Vector3(2.0 * sx, -0.2, -0.9), Vector3(1.1 * sx, -0.1, -0.9), Vector3(0, 0, -0.6)]
+		for k in range(1, pts.size() - 1):
+			st.add_vertex(pts[0])
+			st.add_vertex(pts[k])
+			st.add_vertex(pts[k + 1])
+		st.generate_normals()
+		var wm := StandardMaterial3D.new()
+		wm.albedo_color = Color("8f1d2a")
+		wm.cull_mode = BaseMaterial3D.CULL_DISABLED
+		part.call(st.commit(), wm, Vector3.ZERO, Vector3.ZERO, pivot)
+		root.set_meta("wing%d" % (0 if sx < 0 else 1), pivot)
+	var tail := CylinderMesh.new()
+	tail.top_radius = 0.02
+	tail.bottom_radius = 0.3
+	tail.height = 1.6
+	part.call(tail, red, Vector3(0, 0.75, -1.55), Vector3(-1.2, 0, 0), root)
+	return root
+
+
+func build_bosses() -> void:
+	for id in BOSS:
+		var b: Dictionary = BOSS[id]
+		var node := -1
+		for i in path_nodes.size():
+			if path_nodes[i].get("boss", "") == id:
+				node = i
+		var model: Node3D
+		var anim: AnimationPlayer = null
+		if b["model"] != "":
+			model = load_hero({"id": b["model"], "show": b["show"]})
+			anim = model.find_children("*", "AnimationPlayer", true, false)[0]
+			tint_model(model, b["tint"], id == "golem")
+			for n in ["Idle", "2H_Melee_Idle"]:
+				if anim.has_animation(n):
+					anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+			anim.play("Idle")
+		else:
+			model = make_dragon()
+		var pos := hpos(b["hex"].x, b["hex"].y)
+		if id == "dragon":
+			pos += Vector3(0, 2.6, 0)
+		model.position = pos
+		model.scale = Vector3.ONE * b["scale"]
+		var tgt: Vector3 = path_nodes[node]["p"]
+		model.rotation.y = atan2(tgt.x - pos.x, tgt.z - pos.z)
+		roots["board"].add_child(model)
+		var lbl := Label3D.new()
+		lbl.font = font_head
+		lbl.font_size = 44
+		lbl.pixel_size = 0.008
+		lbl.outline_size = 14
+		lbl.outline_modulate = Color(0.08, 0.02, 0.04)
+		lbl.modulate = Color("ffb59a")
+		lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		lbl.no_depth_test = true
+		lbl.position = pos + Vector3(0, 3.4 if id != "dragon" else 2.4, 0)
+		roots["board"].add_child(lbl)
+		bosses[id] = {"node": node, "hp": b["hp"], "max": b["hp"], "model": model, "anim": anim, "label": lbl, "home": pos}
+		boss_label(id)
+
+
+func boss_label(id: String) -> void:
+	var b: Dictionary = bosses[id]
+	var hearts := ""
+	for i in b["max"]:
+		hearts += "♥" if i < b["hp"] else "♡"
+	b["label"].text = "%s\n%s" % [BOSS[id]["name"], hearts]
+
+
+func boss_anim(id: String, n: String) -> void:
+	var a: AnimationPlayer = bosses[id]["anim"]
+	if a and a.has_animation(n):
+		a.play(n, 0.2)
+
+
+func roll_d100() -> int:
+	var tens := randi_range(0, 9)
+	var units := randi_range(0, 9)
+	var v := tens * 10 + units
+	if v == 0:
+		v = 100
+	d100.visible = true
+	var l1: Label = d100.get_child(0).get_child(0)
+	var l2: Label = d100.get_child(1).get_child(0)
+	for k in 14:
+		l1.text = "%d0" % randi_range(0, 9)
+		l2.text = str(randi_range(0, 9))
+		await get_tree().create_timer(0.06).timeout
+	l1.text = "%d0" % tens
+	l2.text = str(units)
+	d100.scale = Vector2(0.6, 0.6)
+	var tw := create_tween()
+	tw.tween_property(d100, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	await get_tree().create_timer(1.1).timeout
+	d100.visible = false
+	return v
+
+
+func boss_fight(id: String) -> void:
+	busy = true
+	btn_act.disabled = true
+	var b: Dictionary = bosses[id]
+	hero_yaw_goal = atan2(b["home"].x - hero.position.x, b["home"].z - hero.position.z)
+	boss_anim(id, "Cheer")
+	say("¡%s te cierra el paso! Los dados de porcentaje deciden el desafío…" % BOSS[id]["name"])
+	await get_tree().create_timer(1.0).timeout
+	var v: int = await roll_d100()
+	var tier: Array = TIERS[3]
+	for t in TIERS:
+		if v <= t[0]:
+			tier = t
+			break
+	var dmg: int = tier[2] * (2 if v == 100 else 1)
+	say("%d: desafío de nivel %s. Si aciertas, %d de daño." % [v, ["Aprendiz", "Experto", "Genio", "Maestro"][tier[1]], dmg])
+	await get_tree().create_timer(1.2).timeout
+	var c := draw(["riddle", "logic", "math", "skill"][randi() % 4], tier[1])
+	qpanel.open(c, tier[1])
+	var good: bool = await qpanel.finished
+	if good:
+		play(hero_def.get("atk", "1H_Melee_Attack_Chop"))
+		await get_tree().create_timer(0.45).timeout
+		boss_anim(id, "Hit_A")
+		damage_pop(b["home"] + Vector3(0, 2.6, 0), "-%d" % dmg)
+		b["hp"] = maxi(0, b["hp"] - dmg)
+		boss_label(id)
+		await get_tree().create_timer(0.8).timeout
+		play("Idle")
+		if b["hp"] == 0:
+			await boss_defeated(id)
+			return
+		say("¡Golpe! %s pierde %d %s; le quedan %d." % [BOSS[id]["name"], dmg, "corazón" if dmg == 1 else "corazones", b["hp"]])
+		busy = false
+		btn_act.disabled = false
+		rolls_used = 0
+		update_stats()
+		offer("Atacar otra vez", boss_fight.bind(id))
+		return
+	boss_anim(id, "2H_Melee_Attack_Chop")
+	await get_tree().create_timer(0.5).timeout
+	play("Hit_A")
+	busy = false
+	btn_act.disabled = false
+	after_question(false)
+	boss_anim(id, "Idle")
+
+
+func damage_pop(at: Vector3, txt: String) -> void:
+	var l := Label3D.new()
+	l.text = txt
+	l.font = font_epic
+	l.font_size = 96
+	l.pixel_size = 0.01
+	l.outline_size = 22
+	l.modulate = Color("ffe08a")
+	l.outline_modulate = Color("5a1208")
+	l.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	l.no_depth_test = true
+	l.position = at
+	roots["board"].add_child(l)
+	var tw := create_tween()
+	tw.tween_property(l, "position", at + Vector3(0, 1.4, 0), 1.0)
+	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.0).set_delay(0.4)
+	tw.tween_callback(l.queue_free)
+
+
+func boss_defeated(id: String) -> void:
+	var b: Dictionary = bosses[id]
+	boss_anim(id, "Death_A")
+	stars += 3
+	update_stats()
+	say("¡Has vencido a %s! +3 estrellas." % BOSS[id]["name"])
+	play("Cheer")
+	await get_tree().create_timer(1.4).timeout
+	var tw := create_tween()
+	tw.tween_property(b["model"], "scale", Vector3.ONE * 0.01, 0.6)
+	tw.parallel().tween_property(b["label"], "modulate:a", 0.0, 0.6)
+	await tw.finished
+	b["model"].visible = false
+	b["label"].visible = false
+	busy = false
+	btn_act.disabled = false
+	if id == "dragon":
+		victory()
+		return
+	rolls_used = 0
+	update_stats()
+	offer()
+
+
+func victory() -> void:
+	play("Cheer")
+	say("¡Habéis vencido al Dragón Carmesí y salvado el reino! Total: %d estrellas." % stars)
+	offer("Jugar otra vez", func(): get_tree().reload_current_scene())
+
 # ---------------------------------------------------------------- hero
 func load_hero(def: Dictionary) -> Node3D:
 	var path := "res://assets/heroes/%s.glb" % def["id"]
@@ -753,11 +1049,13 @@ func walk_to(p: Vector3, dur: float) -> void:
 
 
 # ---------------------------------------------------------------- cards
-func draw(cat: String) -> Dictionary:
+func draw(cat: String, lvl := -1) -> Dictionary:
+	if lvl < 0:
+		lvl = level
 	if cat == "skill":
 		return {"cat": "skill", "game": ["memoria", "simon", "faroles"][randi() % 3]}
-	var src: Array = bank[cat][level]
-	var dk := "%s%d" % [cat, level]
+	var src: Array = bank[cat][lvl]
+	var dk := "%s%d" % [cat, lvl]
 	if not decks.has(dk) or decks[dk].is_empty():
 		var idx := range(src.size())
 		idx.shuffle()
@@ -765,11 +1063,11 @@ func draw(cat: String) -> Dictionary:
 	var c: Dictionary = src[decks[dk].pop_back()].duplicate(true)
 	c["cat"] = cat
 	if cat == "logic":
-		with_opts(c)
+		with_opts(c, lvl)
 	return c
 
 
-func with_opts(c: Dictionary) -> void:
+func with_opts(c: Dictionary, lvl: int) -> void:
 	var a: String = c["a"]
 	var d := []
 	if c.has("o"):
@@ -789,7 +1087,7 @@ func with_opts(c: Dictionary) -> void:
 					d.append(t)
 	if d.size() < 3:
 		var others := []
-		for x in bank["logic"][level]:
+		for x in bank["logic"][lvl]:
 			others.append(x["a"])
 		others.shuffle()
 		for x in others:
@@ -865,6 +1163,8 @@ func roll_dice() -> void:
 		trail.append(n)
 		n = to
 		hero_at = n
+		if boss_alive(n):
+			break
 	play("Idle")
 	busy = false
 	btn_act.disabled = false
@@ -881,9 +1181,11 @@ func landed(n: int) -> void:
 			say("La entrada de la mina huele a humedad… y a tesoro. ¿Bajas?")
 			offer("Bajar a la mazmorra", enter.bind("dungeon"))
 		"boss":
-			say("¡La Fortaleza del Dragón! Aquí empezaría la batalla final.")
-			play("Cheer")
-			offer("Volver a la salida", back_to_start)
+			if boss_alive(n):
+				await boss_fight(path_nodes[n]["boss"])
+			else:
+				say("El camino está libre: ya vencisteis a %s." % BOSS[path_nodes[n]["boss"]]["name"])
+				end_turn_or_continue()
 		"riddle", "logic", "math", "skill":
 			busy = true
 			btn_act.disabled = true
@@ -917,7 +1219,7 @@ func after_question(good: bool) -> void:
 			offer()
 		return
 	play("Hit_A")
-	say("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"])
+	say("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"] if last_roll > 0 else "¡Vaya! Esta vez no ha salido bien.")
 	busy = true
 	btn_act.disabled = true
 	await get_tree().create_timer(0.8).timeout
@@ -1101,6 +1403,12 @@ func fade_to(a: float) -> void:
 # ---------------------------------------------------------------- per frame
 func _process(dt: float) -> void:
 	var t := Time.get_ticks_msec() / 1000.0
+	if bosses.has("dragon") and bosses["dragon"]["model"].visible:
+		var dm: Node3D = bosses["dragon"]["model"]
+		var f := sin(t * 2.6) * 0.35
+		dm.get_meta("wing0").rotation.z = f
+		dm.get_meta("wing1").rotation.z = -f
+		dm.position.y = bosses["dragon"]["home"].y + sin(t * 1.3) * 0.15
 	if hero:
 		hero_yaw += wrapf(hero_yaw_goal - hero_yaw, -PI, PI) * minf(1.0, dt * 10.0)
 		hero.rotation.y = hero_yaw
@@ -1128,6 +1436,13 @@ func _unhandled_input(e: InputEvent) -> void:
 	# testing shortcuts on a keyboard: 1 riddle, 2 logic, 3 problem, 4-6 skill games
 	if e is InputEventKey and e.pressed and not busy and mode == "board":
 		var k: int = e.keycode - KEY_1
+		if k == 6:
+			for id in bosses:
+				if bosses[id]["hp"] > 0:
+					hero_at = bosses[id]["node"]
+					hero.position = path_nodes[hero_at]["p"]
+					boss_fight(id)
+					return
 		if k >= 0 and k <= 5:
 			busy = true
 			var c := draw(["riddle", "logic", "math", "skill", "skill", "skill"][k])
@@ -1326,6 +1641,30 @@ func build_ui() -> void:
 	lbl_dice.visible = false
 	ui.add_child(lbl_dice)
 
+	d100 = HBoxContainer.new()
+	d100.add_theme_constant_override("separation", 18)
+	d100.visible = false
+	d100.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(d100)
+	for i in 2:
+		var pc := PanelContainer.new()
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color("7a1b26") if i == 0 else Color("2d4f9e")
+		sb.border_color = Color("f2c14e")
+		sb.set_border_width_all(4)
+		sb.set_corner_radius_all(28)
+		sb.content_margin_left = 26
+		sb.content_margin_right = 26
+		pc.add_theme_stylebox_override("panel", sb)
+		pc.custom_minimum_size = Vector2(150, 140)
+		var l := Label.new()
+		l.add_theme_font_override("font", font_epic)
+		l.add_theme_font_size_override("font_size", 92)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		pc.add_child(l)
+		d100.add_child(pc)
+
 	qpanel = preload("res://question_panel.gd").new()
 	ui.add_child(qpanel)
 	qpanel.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
@@ -1353,5 +1692,8 @@ func _on_resize() -> void:
 	btn_act.position = Vector2(sz.x - btn_act.size.x - m, sz.y - btn_act.size.y - m - 6)
 	msg.reset_size()
 	msg.position = Vector2((sz.x - msg.size.x) * 0.5, sz.y - msg.size.y - 104)
+	d100.reset_size()
+	d100.pivot_offset = d100.size * 0.5
+	d100.position = Vector2((sz.x - d100.size.x) * 0.5, sz.y * 0.32)
 	box_choices.reset_size()
 	box_choices.position = (sz - box_choices.size) * 0.5

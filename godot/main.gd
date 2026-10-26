@@ -131,6 +131,12 @@ var qpanel: Control
 var lbl_stats: Label
 var bosses := {}
 var d100: HBoxContainer
+## Each player keeps these fields; the globals always hold the player whose turn it is.
+const PFIELDS := ["hero_def", "hero", "hero_anim", "hero_at", "hero_yaw", "hero_yaw_goal", "stars", "items", "relics", "attrs", "hero_lv", "xp", "hp", "lv_pending", "next_roll", "fire", "trail", "last_roll", "fallen"]
+var players: Array = []
+var turn := 0
+var fallen := false
+var party_ui: Control
 var hero_lv := 1
 var hp := 6  # in half hearts
 var hearts_box: HBoxContainer
@@ -1132,10 +1138,13 @@ func boss_fight(id: String) -> void:
 		if v <= t[0]:
 			tier = t
 			break
-	var dmg: int = tier[2] * (2 if v == 100 else 1) + attrs["fuerza"]
+	var mates := team()
+	var dmg: int = tier[2] * (2 if v == 100 else 1) + attrs["fuerza"] + mates.size()
 	if fire:
 		dmg *= 2
 	var extra := ""
+	if not mates.is_empty():
+		extra += " (+%d por atacar en equipo)" % mates.size()
 	if attrs["fuerza"] > 0:
 		extra += " (con tu fuerza)"
 	if fire:
@@ -1225,9 +1234,7 @@ func boss_defeated(id: String) -> void:
 	if id == "dragon":
 		victory()
 		return
-	rolls_used = 0
-	update_stats()
-	offer()
+	end_turn()
 
 
 func victory() -> void:
@@ -1355,7 +1362,7 @@ func run_quest(id: String) -> void:
 			paid = true
 		elif t.has("roll"):
 			var v: int = await roll_d100()
-			var bonus: int = 10 + attrs[t["roll"]] * 10
+			var bonus: int = 10 + attrs[t["roll"]] * 10 + team().size() * 10
 			ok = v + bonus >= int(t["target"])
 			notes.append("Tirada: %d + %d = %d (necesitabais %d)" % [v, bonus, v + bonus, t["target"]])
 		else:
@@ -1407,10 +1414,7 @@ func run_quest(id: String) -> void:
 	btn_act.disabled = false
 	play("Idle")
 	if mode == "board":
-		rolls_used = 0
-		update_stats()
-		offer()
-		say("¡Misión cumplida! Tira el dado." if quests_done.has(id) else "Turno nuevo. ¡Tira el dado!")
+		end_turn("¡Misión cumplida!" if quests_done.has(id) else "Fin del turno.")
 	else:
 		interior_offer()
 
@@ -1457,8 +1461,6 @@ func use_hero(def: Dictionary) -> void:
 		goal = hero.position
 	img_hero.texture = load("res://assets/art/%s.jpg" % def["art"])
 	lbl_name.text = "%s · %s" % [def["name"], def["title"]]
-	for b in picker.get_children():
-		b.modulate = Color.WHITE if b.get_meta("id") == def["id"] else Color(0.6, 0.6, 0.7)
 	play("Cheer")
 	await get_tree().create_timer(1.6).timeout
 	play("Idle")
@@ -1549,10 +1551,16 @@ func update_stats() -> void:
 		bar_xp.tooltip_text = "Experiencia %d / %d" % [xp, need]
 		btn_bag.text = "Bolsa  %d/%d" % [items.size(), MAX_ITEMS]
 		draw_hearts()
+		if players.size() > 1:
+			refresh_strip()
 
 
 func max_hp() -> int:
-	return 2 * (3 + (hero_lv - 1) / 3)
+	return max_hp_for(hero_lv)
+
+
+func max_hp_for(lv: int) -> int:
+	return 2 * (3 + (lv - 1) / 3)
 
 
 func draw_hearts() -> void:
@@ -1608,28 +1616,48 @@ func fall() -> void:
 		play("Cheer")
 		say("¡El Elixir de vida brilla y %s se levanta con 2 corazones!" % hero_def["name"])
 		await get_tree().create_timer(1.6).timeout
+	elif players.size() > 1 and not team_alive().is_empty():
+		fallen = true
+		mark_fallen(hero, true)
+		busy = false
+		btn_act.disabled = false
+		end_turn("%s ha caído. Un compañero puede levantarle llegando a su casilla o usando un portal." % hero_def["name"])
+		return
 	else:
-		var lost := mini(stars, 2)
-		stars -= lost
-		await fade_to(1.0)
-		var inn := 0
-		for i in path_nodes.size():
-			if path_nodes[i]["type"] == "tavern":
-				inn = i
-		hero_at = inn
-		trail.clear()
-		hero.position = path_nodes[inn]["p"]
-		hp = maxi(2, max_hp() / 2)
-		update_stats()
-		play("Idle")
-		await fade_to(0.0)
-		say("Doña Petra te ha recogido y curado en la posada (pierdes %d ★). Vuelves con %d corazones. Con un Elixir de vida, o con un compañero a tu lado, no tendrás que volver." % [lost, hp / 2])
+		await rescue_at_inn()
+		return
 	play("Idle")
 	busy = false
 	btn_act.disabled = false
-	rolls_used = 0
+	end_turn()
+
+
+## Doña Petra carries a fallen hero to the inn: they lose 2 stars and come back with half their hearts.
+func rescue_at_inn() -> void:
+	busy = true
+	btn_act.disabled = true
+	var lost := mini(stars, 2)
+	stars -= lost
+	fallen = false
+	mark_fallen(hero, false)
+	await fade_to(1.0)
+	var inn := 0
+	for i in path_nodes.size():
+		if path_nodes[i]["type"] == "tavern":
+			inn = i
+	hero_at = inn
+	trail.clear()
+	hero.position = path_nodes[inn]["p"]
+	hp = maxi(2, max_hp() / 2)
 	update_stats()
-	offer()
+	play("Idle")
+	await fade_to(0.0)
+	place_heroes()
+	var note := "Doña Petra te ha recogido y curado en la posada (pierdes %d ★). Vuelves con %d corazones." % [lost, hp / 2]
+	play("Idle")
+	busy = false
+	btn_act.disabled = false
+	end_turn(note)
 
 
 func xp_need(lv: int) -> int:
@@ -1741,6 +1769,8 @@ func roll_dice() -> void:
 		trail.append(n)
 		n = to
 		hero_at = n
+		if s < v - 1:
+			await revive_here()
 		if boss_alive(n):
 			break
 		if s < v - 1 and path_nodes[n]["type"] == "shop":
@@ -1751,9 +1781,7 @@ func roll_dice() -> void:
 			if res == "push":
 				busy = false
 				btn_act.disabled = false
-				rolls_used = 0
-				update_stats()
-				offer()
+				end_turn()
 				return
 			if res == "stop":
 				break
@@ -1764,6 +1792,8 @@ func roll_dice() -> void:
 
 
 func landed(n: int) -> void:
+	place_heroes()
+	await revive_here()
 	if mini_alive(n):
 		var id: String = path_nodes[n]["mini"]
 		if not bosses[id]["awake"]:
@@ -1823,25 +1853,28 @@ func after_question(good: bool, cat := "", xp_wrong := true) -> void:
 		play("Cheer")
 		var amount := 15 if cat == "skill" else 10
 		var up := gain_xp(amount)
+		var coop := ""
+		var mates := team()
+		if not mates.is_empty():
+			var names := []
+			for i in mates:
+				players[i]["stars"] += 1
+				gain_xp_other(i, amount)
+				names.append(players[i]["hero_def"]["name"])
+			coop = " ¡Habéis cooperado: %s también gana%s 1 ★!" % [" y ".join(names), "n" if names.size() > 1 else ""]
 		update_stats()
 		if rolls_used < 3:
-			say("¡Muy bien! +1 estrella y %d de experiencia.%s Puedes volver a tirar (%d de 3)." % [amount, up, rolls_used + 1])
+			say("¡Muy bien! +1 estrella y %d de experiencia.%s%s Puedes volver a tirar (%d de 3)." % [amount, up, coop, rolls_used + 1])
 			offer()
 		else:
-			say("¡Muy bien! +1 estrella y %d de experiencia.%s Ya has usado tus 3 tiradas: empieza un turno nuevo." % [amount, up])
-			rolls_used = 0
-			update_stats()
-			offer()
+			end_turn("¡Muy bien! +1 estrella y %d de experiencia.%s%s Ya has usado tus 3 tiradas." % [amount, up, coop])
 		return
 	play("Hit_A")
 	var up := gain_xp(2) if xp_wrong else ""
 	if items.has("escudo") and last_roll > 0:
 		items.erase("escudo")
 		burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
-		rolls_used = 0
-		update_stats()
-		say("¡Tu escudo te protege y no retrocedes! +2 de experiencia por intentarlo.%s" % up)
-		offer()
+		end_turn("¡Tu escudo te protege y no retrocedes! +2 de experiencia por intentarlo.%s" % up)
 		return
 	say(("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"] if last_roll > 0 else "¡Vaya! Esta vez no ha salido bien.") + (" +2 de experiencia por intentarlo." if xp_wrong else "") + up)
 	busy = true
@@ -1854,17 +1887,39 @@ func after_question(good: bool, cat := "", xp_wrong := true) -> void:
 		await walk_to(path_nodes[back]["p"], 0.38)
 		hero_at = back
 	play("Idle")
+	place_heroes()
 	busy = false
 	btn_act.disabled = false
-	rolls_used = 0
-	update_stats()
-	say("Turno nuevo. ¡Tira el dado!")
-	offer()
+	end_turn("Fin del turno.")
 
 
 func end_turn_or_continue() -> void:
+	end_turn()
+
+
+## Ends the turn. With several players the next one (in order) takes over.
+func end_turn(note := "") -> void:
 	rolls_used = 0
-	update_stats()
+	if note != "":
+		say(note)
+	if players.size() <= 1:
+		update_stats()
+		offer()
+		return
+	busy = true
+	btn_act.disabled = true
+	await get_tree().create_timer(1.6 if note != "" else 0.6).timeout
+	save_player()
+	load_player((turn + 1) % players.size())
+	place_heroes()
+	busy = false
+	btn_act.disabled = false
+	if fallen:
+		await fallen_turn()
+		return
+	say("¡Turno de %s! Tira el dado." % hero_def["name"])
+	play("Cheer")
+	get_tree().create_timer(1.4).timeout.connect(func(): play("Idle"))
 	offer()
 
 
@@ -2045,6 +2100,295 @@ func fade_to(a: float) -> void:
 	await tw.finished
 
 
+# ---------------------------------------------------------------- players and turns
+func new_player(def: Dictionary) -> Dictionary:
+	var h := load_hero(def)
+	roots["board"].add_child(h)
+	h.scale = Vector3.ONE * 0.52
+	h.position = path_nodes[0]["p"] + Vector3(0, 0.02, 0)
+	var a: AnimationPlayer = h.find_children("*", "AnimationPlayer", true, false)[0]
+	for n in ["Idle", "Walking_A"]:
+		if a.has_animation(n):
+			a.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+	a.play("Idle")
+	var tag := Label3D.new()
+	tag.text = def["name"]
+	tag.font = font_head
+	tag.font_size = 30
+	tag.pixel_size = 0.016
+	tag.outline_size = 10
+	tag.outline_modulate = Color(0.05, 0.03, 0.1)
+	tag.modulate = Color("ffe2a0")
+	tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	tag.no_depth_test = true
+	tag.position = Vector3(0, 3.0, 0)
+	tag.name = "tag"
+	h.add_child(tag)
+	return {"hero_def": def, "hero": h, "hero_anim": a, "hero_at": 0, "hero_yaw": 0.0, "hero_yaw_goal": 0.0, "stars": 0,
+		"items": [], "relics": [], "attrs": {"fuerza": 0, "sabiduria": 0, "suerte": 0}, "hero_lv": 1, "xp": 0, "hp": 6,
+		"lv_pending": 0, "next_roll": 0, "fire": false, "trail": [], "last_roll": 0, "fallen": false}
+
+
+func save_player() -> void:
+	if players.is_empty():
+		return
+	for f in PFIELDS:
+		players[turn][f] = get(f)
+
+
+func load_player(i: int) -> void:
+	turn = i
+	for f in PFIELDS:
+		set(f, players[i][f])
+	img_hero.texture = load("res://assets/art/%s.jpg" % hero_def["art"])
+	lbl_name.text = "%s · %s" % [hero_def["name"], hero_def["title"]]
+	if mode == "board":
+		goal = hero.position
+	update_stats()
+
+
+## Reads a field of any player (the globals for the one playing now).
+func pget(i: int, f: String) -> Variant:
+	return get(f) if i == turn else players[i][f]
+
+
+## Other players standing on my square, still on their feet.
+func team() -> Array:
+	var out := []
+	if mode != "board":
+		return out
+	for i in players.size():
+		if i != turn and not players[i]["fallen"] and players[i]["hero_at"] == hero_at:
+			out.append(i)
+	return out
+
+
+func team_alive() -> Array:
+	var out := []
+	for i in players.size():
+		if i != turn and not players[i]["fallen"]:
+			out.append(i)
+	return out
+
+
+func gain_xp_other(i: int, n: int) -> void:
+	var d: Dictionary = players[i]
+	if d["hero_lv"] >= MAX_LV:
+		return
+	d["xp"] += n
+	while d["hero_lv"] < MAX_LV and d["xp"] >= xp_need(d["hero_lv"]):
+		d["xp"] -= xp_need(d["hero_lv"])
+		d["hero_lv"] += 1
+		d["lv_pending"] += 1
+		d["hp"] = mini(max_hp_for(d["hero_lv"]), d["hp"] + 2)
+
+
+## Heroes sharing a square stand around it instead of on top of each other.
+func place_heroes() -> void:
+	if players.size() < 2:
+		return
+	var by_node := {}
+	for i in players.size():
+		var at: int = pget(i, "hero_at")
+		if not by_node.has(at):
+			by_node[at] = []
+		by_node[at].append(i)
+	for at in by_node:
+		var list: Array = by_node[at]
+		for k in list.size():
+			var i: int = list[k]
+			var h: Node3D = pget(i, "hero")
+			if h.get_parent() != roots["board"]:
+				continue
+			var off := Vector3.ZERO
+			if list.size() > 1:
+				var ang := TAU * k / list.size() + 0.4
+				off = Vector3(cos(ang), 0, sin(ang)) * 0.55
+			var tw := create_tween()
+			tw.tween_property(h, "position", path_nodes[at]["p"] + off + Vector3(0, 0.02, 0), 0.35)
+	refresh_strip()
+
+
+func mark_fallen(h: Node3D, down: bool) -> void:
+	var a: AnimationPlayer = h.find_children("*", "AnimationPlayer", true, false)[0]
+	a.play("Death_A" if down else "Idle", 0.25)
+	var tag: Label3D = h.get_node("tag")
+	var n: String = tag.text.replace("✚ ", "")
+	tag.text = "✚ " + n if down else n
+	tag.modulate = Color("ff8a8a") if down else Color("ffe2a0")
+	refresh_strip()
+
+
+## Fallen companions on the current square get back up (2 hearts) thanks to the hero who arrives.
+func revive_here() -> void:
+	if mode != "board" or fallen:
+		return
+	for i in players.size():
+		if i == turn or not players[i]["fallen"] or players[i]["hero_at"] != hero_at:
+			continue
+		var d: Dictionary = players[i]
+		d["fallen"] = false
+		d["hp"] = 4
+		mark_fallen(d["hero"], false)
+		burst(d["hero"].position + Vector3(0, 1.0, 0), Color("ff7a9a"))
+		play("Interact")
+		var up := gain_xp(10)
+		say("¡%s ayuda a %s a levantarse! Vuelve con 2 corazones. +10 de experiencia por ayudar.%s" % [hero_def["name"], d["hero_def"]["name"], up])
+		await get_tree().create_timer(1.8).timeout
+		play("Idle")
+
+
+## Turn of a fallen hero: wait for help or go to the inn.
+func fallen_turn() -> void:
+	if team_alive().is_empty():
+		say("Todos los héroes han caído. Doña Petra os recoge a todos.")
+		await get_tree().create_timer(1.6).timeout
+		await rescue_at_inn()
+		return
+	var n: int = await pick_options("%s está en el suelo. ¿Qué hace?" % hero_def["name"], ["Esperar ayuda", "Ir a la posada (−2 ★)"], false)
+	if n == 0:
+		end_turn("%s espera a que un compañero venga a ayudarle." % hero_def["name"])
+	else:
+		await rescue_at_inn()
+
+
+func refresh_strip() -> void:
+	if not picker:
+		return
+	for c in picker.get_children():
+		picker.remove_child(c)
+		c.queue_free()
+	for i in players.size():
+		var def: Dictionary = pget(i, "hero_def")
+		var pc := PanelContainer.new()
+		var sb := box_style(Color(0.05, 0.06, 0.14, 0.85), gold if i == turn else Color(1, 1, 1, 0.15), 12, 3 if i == turn else 1)
+		sb.content_margin_left = 4
+		sb.content_margin_right = 4
+		sb.content_margin_top = 4
+		sb.content_margin_bottom = 2
+		pc.add_theme_stylebox_override("panel", sb)
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 0)
+		pc.add_child(col)
+		var t := TextureRect.new()
+		t.texture = load("res://assets/art/%s.jpg" % def["art"])
+		t.custom_minimum_size = Vector2(64, 64)
+		t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		if pget(i, "fallen"):
+			t.modulate = Color(0.5, 0.4, 0.4)
+		col.add_child(t)
+		var l := Label.new()
+		l.text = "%s%d★ ♥%s" % ["✚ " if pget(i, "fallen") else "", pget(i, "stars"), str(pget(i, "hp") / 2.0).replace(".5", "½").replace(".0", "")]
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.add_theme_font_override("font", font_bold)
+		l.add_theme_font_size_override("font_size", 14)
+		col.add_child(l)
+		picker.add_child(pc)
+	_on_resize.call_deferred()
+
+
+# ---------------------------------------------------------------- choosing the party
+func choose_party() -> void:
+	party_ui.visible = true
+	var chosen := []
+	var row: HBoxContainer = party_ui.get_node("col/row")
+	var info: Label = party_ui.get_node("col/info")
+	var go: Button = party_ui.get_node("col/go")
+	for c in row.get_children():
+		row.remove_child(c)
+		c.queue_free()
+	var badges := []
+	for def in HEROES:
+		var cell := VBoxContainer.new()
+		var b := TextureButton.new()
+		b.texture_normal = load("res://assets/art/%s.jpg" % def["art"])
+		b.ignore_texture_size = true
+		b.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_COVERED
+		b.custom_minimum_size = Vector2(150, 150)
+		cell.add_child(b)
+		var n := Label.new()
+		n.text = def["name"]
+		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		n.add_theme_font_override("font", font_head)
+		n.add_theme_font_size_override("font_size", 26)
+		cell.add_child(n)
+		var badge := Label.new()
+		badge.add_theme_font_override("font", font_epic)
+		badge.add_theme_font_size_override("font_size", 54)
+		badge.add_theme_color_override("font_color", Color("ffd27a"))
+		badge.add_theme_color_override("font_outline_color", Color("2a1204"))
+		badge.add_theme_constant_override("outline_size", 14)
+		badge.position = Vector2(8, -6)
+		b.add_child(badge)
+		badges.append([def, badge, b])
+		row.add_child(cell)
+	var paint := func():
+		for x in badges:
+			var k: int = chosen.find(x[0])
+			x[1].text = str(k + 1) if k >= 0 else ""
+			x[2].modulate = Color.WHITE if k >= 0 else Color(0.55, 0.55, 0.65)
+		go.disabled = chosen.is_empty()
+		info.text = "Tocad los héroes que vais a jugar, en el orden de los turnos (de 1 a 4 jugadores)." if chosen.is_empty() else "%d jugador%s: %s" % [chosen.size(), "" if chosen.size() == 1 else "es", ", ".join(chosen.map(func(d): return d["name"]))]
+	for x in badges:
+		var def: Dictionary = x[0]
+		x[2].pressed.connect(func():
+			if chosen.has(def):
+				chosen.erase(def)
+			elif chosen.size() < 4:
+				chosen.append(def)
+			paint.call())
+	paint.call()
+	await go.pressed
+	party_ui.visible = false
+	# replace the title-screen hero with the party
+	if hero:
+		hero.queue_free()
+	players.clear()
+	for def in chosen:
+		players.append(new_player(def))
+	load_player(0)
+	place_heroes()
+
+
+func build_party_ui() -> void:
+	party_ui = Control.new()
+	party_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ui.add_child(party_ui)
+	var shade := ColorRect.new()
+	shade.color = Color(0.02, 0.02, 0.07, 0.6)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	party_ui.add_child(shade)
+	var col := VBoxContainer.new()
+	col.name = "col"
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 16)
+	col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	party_ui.add_child(col)
+	var t := Label.new()
+	t.text = "¿Quién juega?"
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.add_theme_font_override("font", font_epic)
+	t.add_theme_font_size_override("font_size", 64)
+	t.add_theme_color_override("font_color", Color("ffd27a"))
+	col.add_child(t)
+	var info := Label.new()
+	info.name = "info"
+	info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	info.add_theme_font_size_override("font_size", 22)
+	col.add_child(info)
+	var row := HBoxContainer.new()
+	row.name = "row"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 14)
+	col.add_child(row)
+	var go := big_button("  ¡A jugar!  ")
+	go.name = "go"
+	go.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	col.add_child(go)
+	party_ui.visible = false
+
+
 # ---------------------------------------------------------------- shop and bag
 func open_shop() -> void:
 	hero_yaw_goal = atan2(hpos(SHOP_NPC.x, SHOP_NPC.y).x - hero.position.x, hpos(SHOP_NPC.x, SHOP_NPC.y).z - hero.position.z)
@@ -2139,14 +2483,23 @@ func use_item(id: String) -> void:
 			say("Dado trucado: tu próxima tirada será un %d." % next_roll)
 		"portal":
 			var dest := ["tavern", "dungeon", "shop"]
-			var n: int = await pick_options("¿Adónde quieres viajar?", ["Posada del Grifo", "Entrada de la mina", "Tienda de Remigio"])
+			var labels := ["Posada del Grifo", "Entrada de la mina", "Tienda de Remigio"]
+			var who := []
+			for i in players.size():
+				if i != turn:
+					who.append(i)
+					labels.append("Junto a " + players[i]["hero_def"]["name"])
+			var n: int = await pick_options("¿Adónde quieres viajar?", labels)
 			if n < 0:
 				return
 			items.erase(id)
 			var to := 0
-			for i in path_nodes.size():
-				if path_nodes[i]["type"] == dest[n]:
-					to = i
+			if n >= 3:
+				to = players[who[n - 3]]["hero_at"]
+			else:
+				for i in path_nodes.size():
+					if path_nodes[i]["type"] == dest[n]:
+						to = i
 			burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
 			trail.append(hero_at)
 			hero_at = to
@@ -2159,7 +2512,7 @@ func use_item(id: String) -> void:
 
 
 ## Shows a row of big buttons and returns the index chosen (or -1 for «Cancelar»).
-func pick_options(question: String, labels: Array) -> int:
+func pick_options(question: String, labels: Array, can_cancel := true) -> int:
 	for c in box_choices.get_children():
 		c.queue_free()
 	box_choices.visible = true
@@ -2169,11 +2522,12 @@ func pick_options(question: String, labels: Array) -> int:
 		b.custom_minimum_size.x = 96 if labels[i].length() < 3 else 0
 		b.pressed.connect(func(): out.append(i))
 		box_choices.add_child(b)
-	var c := Button.new()
-	c.text = "Cancelar"
-	c.custom_minimum_size = Vector2(0, 64)
-	c.pressed.connect(func(): out.append(-1))
-	box_choices.add_child(c)
+	if can_cancel:
+		var c := Button.new()
+		c.text = "Cancelar"
+		c.custom_minimum_size = Vector2(0, 64)
+		c.pressed.connect(func(): out.append(-1))
+		box_choices.add_child(c)
 	say(question)
 	_on_resize.call_deferred()
 	while out.is_empty():
@@ -2223,6 +2577,7 @@ func show_title() -> void:
 
 func start_game(with_intro: bool) -> void:
 	title_ui.visible = false
+	await choose_party()
 	if with_intro:
 		await play_intro()
 	cine = false
@@ -2231,7 +2586,11 @@ func start_game(with_intro: bool) -> void:
 	pitch = 0.95
 	dist_goal = 15.0
 	set_hud(true)
-	say("¡Bienvenidos al reino! Tirad el dado para avanzar por el camino.")
+	refresh_strip()
+	if players.size() > 1:
+		say("¡Bienvenidos al reino! Empieza %s. Si compartís casilla, cooperáis: ganáis juntos y podéis levantar a un compañero caído." % hero_def["name"])
+	else:
+		say("¡Bienvenido al reino, %s! Tira el dado para avanzar por el camino." % hero_def["name"])
 	offer()
 
 
@@ -2563,18 +2922,6 @@ func build_ui() -> void:
 	picker = HBoxContainer.new()
 	picker.add_theme_constant_override("separation", 8)
 	ui.add_child(picker)
-	for def in HEROES:
-		var b := TextureButton.new()
-		b.texture_normal = load("res://assets/art/%s.jpg" % def["art"])
-		b.ignore_texture_size = true
-		b.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_COVERED
-		b.custom_minimum_size = Vector2(76, 76)
-		b.set_meta("id", def["id"])
-		b.tooltip_text = "%s, %s" % [def["name"], def["title"]]
-		b.pressed.connect(func():
-			if not busy:
-				use_hero(def))
-		picker.add_child(b)
 	hud.append(picker)
 
 	btn_bag = Button.new()
@@ -2698,6 +3045,7 @@ func build_ui() -> void:
 	ui.add_child(narrator)
 	narrator.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
 	build_title()
+	build_party_ui()
 	ui.move_child(btn_voice, -1)
 
 	fade = ColorRect.new()

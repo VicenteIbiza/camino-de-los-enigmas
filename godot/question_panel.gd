@@ -3,6 +3,7 @@ extends Control
 ## skill games are played against the clock. Emits `finished(ok)` once the player closes the result.
 
 signal finished(ok: bool)
+signal item_used(id: String)
 
 const CAT_NAME := {"riddle": "Adivinanza", "logic": "Acertijo", "math": "Problema", "skill": "Reto de habilidad"}
 const LEVEL_NAME := ["Aprendiz", "Experto", "Genio", "Maestro"]
@@ -30,6 +31,10 @@ var lbl_q: Label
 var content: VBoxContainer
 var result: VBoxContainer
 var line: LineEdit
+var tools: HBoxContainer
+var lbl_hint: Label
+var bag: Array = []
+var hinted := false
 
 # skill game state
 var game := {}
@@ -88,6 +93,14 @@ func setup(f: Dictionary) -> void:
 	lbl_q.add_theme_font_size_override("font_size", 28)
 	lbl_q.custom_minimum_size = Vector2(820, 0)
 	box.add_child(lbl_q)
+	lbl_hint = Label.new()
+	lbl_hint.add_theme_font_override("font", fonts["bold"])
+	lbl_hint.add_theme_font_size_override("font_size", 21)
+	lbl_hint.add_theme_color_override("font_color", Color("9fe3ff"))
+	box.add_child(lbl_hint)
+	tools = HBoxContainer.new()
+	tools.add_theme_constant_override("separation", 10)
+	box.add_child(tools)
 	content = VBoxContainer.new()
 	content.add_theme_constant_override("separation", 10)
 	box.add_child(content)
@@ -105,9 +118,14 @@ func _place() -> void:
 	panel.position = Vector2((sz.x - panel.size.x) * 0.5, maxf(16.0, top))
 
 
-func open(c: Dictionary, lvl: int) -> void:
+## extra: bonus seconds (Sabiduría). items: the hero's bag; Pista and Reloj de arena are spent from it.
+func open(c: Dictionary, lvl: int, extra := 0.0, items: Array = []) -> void:
 	card = c
 	level = lvl
+	bag = items
+	hinted = false
+	lbl_hint.text = ""
+	lbl_hint.visible = false
 	answered = false
 	ok = false
 	for n in content.get_children():
@@ -117,7 +135,7 @@ func open(c: Dictionary, lvl: int) -> void:
 	game = {}
 	var cat: String = c["cat"]
 	lbl_cat.text = "%s · %s" % [CAT_NAME[cat] if cat != "skill" else GAME_NAME[c["game"]], LEVEL_NAME[lvl]]
-	total = 60.0 if cat != "skill" else float(SKILL_SECS[c["game"]][lvl])
+	total = (60.0 if cat != "skill" else float(SKILL_SECS[c["game"]][lvl])) + extra
 	time_left = total
 	match cat:
 		"riddle", "math":
@@ -134,9 +152,81 @@ func open(c: Dictionary, lvl: int) -> void:
 					_simon_ui()
 				_:
 					_lights_ui()
+	_tools_ui()
 	visible = true
 	running = true
 	_place.call_deferred()
+
+
+# ---------------------------------------------------------------- items
+func _tools_ui() -> void:
+	for n in tools.get_children():
+		n.queue_free()
+	for id in ["pista", "reloj"]:
+		var n := bag.count(id)
+		if n == 0 or (id == "pista" and hinted):
+			continue
+		var b := Button.new()
+		b.text = "%s %s (%d)" % ["✦" if id == "pista" else "⌛", "Usar pista" if id == "pista" else "Reloj de arena +30 s", n]
+		b.custom_minimum_size = Vector2(0, 46)
+		b.add_theme_font_override("font", fonts["bold"])
+		b.add_theme_font_size_override("font_size", 19)
+		b.pressed.connect(_use_item.bind(id))
+		tools.add_child(b)
+	tools.visible = tools.get_child_count() > 0
+
+
+func _use_item(id: String) -> void:
+	if not running or not bag.has(id):
+		return
+	bag.erase(id)
+	if id == "reloj":
+		time_left += 30.0
+		total = maxf(total, time_left)
+	else:
+		hinted = true
+		var cat: String = card["cat"]
+		if cat == "skill":
+			time_left += 20.0
+			total = maxf(total, time_left)
+			lbl_hint.text = "La pista te regala 20 segundos más."
+		elif cat == "logic":
+			var btns: Array = content.find_children("*", "Button", true, false)
+			var wrong := []
+			for i in btns.size():
+				if i != card["correct"]:
+					wrong.append(i)
+			wrong.shuffle()
+			for i in wrong.slice(0, 2):
+				btns[i].disabled = true
+				btns[i].modulate.a = 0.25
+			lbl_hint.text = "La pista ha tachado dos respuestas falsas."
+		else:
+			lbl_hint.text = hint_for(card)
+		lbl_hint.visible = true
+	item_used.emit(id)
+	for n in tools.get_children():
+		tools.remove_child(n)
+		n.queue_free()
+	_tools_ui()
+	_place.call_deferred()
+
+
+static func hint_for(c: Dictionary) -> String:
+	var a := str(c["a"])
+	if c["cat"] == "math":
+		var rx := RegEx.new()
+		rx.compile("\\d+(?:[.,]\\d+)?")
+		var m := rx.search(a)
+		var num := m.get_string() if m else a
+		var digits := num.replace(",", "").replace(".", "")
+		return "Pista: el resultado tiene %d cifra%s y empieza por %s." % [digits.length(), "" if digits.length() == 1 else "s", num.substr(0, 1)]
+	var w := a
+	for art in ["el ", "la ", "los ", "las ", "un ", "una ", "tu "]:
+		if w.to_lower().begins_with(art):
+			w = w.substr(art.length())
+			break
+	return "Pista: empieza por «%s» y tiene %d letras." % [w.substr(0, 1).to_upper(), w.replace(" ", "").length()]
 
 
 func _process(dt: float) -> void:
@@ -556,6 +646,8 @@ func _finish(success: bool, timeout: bool) -> void:
 	ok = success
 	_hide_web_input()
 	for b in content.find_children("*", "BaseButton", true, false):
+		b.disabled = true
+	for b in tools.get_children():
 		b.disabled = true
 	if card["cat"] == "logic":
 		var opts_btns: Array = content.find_children("*", "Button", true, false)

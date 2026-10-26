@@ -28,7 +28,27 @@ const QUEST_SPOTS := {
 	"ermita": {"node": Vector2i(4, 0), "npc": Vector2i(4, 1), "model": "Knight", "show": ["Knight_Cape", "Badge_Shield"], "tint": Color(1.2, 1.05, 0.7)},
 }
 const ATTR_NAME := {"fuerza": "Fuerza", "sabiduria": "Sabiduría", "suerte": "Suerte"}
-const ITEM_NAME := {"pista": "Pista", "reloj": "Reloj de arena", "doble": "Dado doble", "escudo": "Escudo", "portal": "Portal", "trucado": "Dado trucado", "espada": "Espada de fuego"}
+const ITEM_NAME := {"elixir": "Elixir de vida", "pocion": "Poción curativa", "pista": "Pista", "reloj": "Reloj de arena", "doble": "Dado doble", "escudo": "Escudo", "portal": "Portal", "trucado": "Dado trucado", "espada": "Espada de fuego"}
+## price, when it is used (q: in a question, r: before rolling, p: by itself) and what it does
+const ITEMS := {
+	"pista": [2, "q", "En una pregunta: tacha dos respuestas falsas, te da la primera letra o suma 20 s a un reto."],
+	"reloj": [2, "q", "En una pregunta o reto: +30 segundos."],
+	"doble": [3, "r", "Tu próxima tirada usa dos dados y suma los dos."],
+	"escudo": [3, "p", "Se usa solo: te libra de una maldición o de retroceder tras un fallo."],
+	"portal": [3, "r", "Viaja al instante a la posada, a la mina o a la tienda."],
+	"trucado": [4, "r", "Eliges tú el número de tu próxima tirada, del 1 al 6."],
+	"espada": [4, "r", "Tu próximo golpe acertado a un enemigo hace el doble de daño."],
+	"pocion": [2, "r", "Recuperas 1 corazón."],
+	"elixir": [5, "p", "Se usa solo: si te quedas sin corazones, te levanta al momento con 2 corazones."],
+}
+const ATTR_INFO := {
+	"fuerza": ["FUE", "+1 de daño en cada golpe a jefes y minijefes."],
+	"sabiduria": ["SAB", "+5 segundos en cada pregunta y reto."],
+	"suerte": ["SUE", "+1 al dado de las maldiciones: más fácil que salga algo bueno."],
+}
+const MAX_ITEMS := 3
+const MAX_LV := 10
+const SHOP_NPC := Vector2i(1, 1)
 const GAME_FOR := {"laberinto": "memoria", "minas": "faroles", "deslizante": "simon", "atrapa": "simon", "memoria": "memoria", "simon": "simon", "faroles": "faroles"}
 const TIERS := [[25, 0, 1], [55, 1, 2], [85, 2, 3], [100, 3, 4]]
 const ACCESSORY := ["Sword", "Shield", "Axe", "Mug", "Spellbook", "Wand", "Staff", "Crossbow", "Knife", "Throwable", "Helmet", "Hat", "Cape"]
@@ -39,9 +59,9 @@ const ROAD := {"A": [3, 0], "B": [3, 1], "C": [3, 2], "D": [3, 1, 5], "M": [3]}
 const TYPE := {
 	"start": [Color("f4efe2"), "▶"], "riddle": [Color("8b5bd6"), "?"], "logic": [Color("13917e"), "◆"], "math": [Color("e2602f"), "+"],
 	"skill": [Color("2f6fe0"), "✦"], "star": [Color("e9a917"), "★"], "quest": [Color("d08a2a"), "!"], "fork": [Color("ffd84a"), "⬌"],
-	"tavern": [Color("ffb347"), "☕"], "dungeon": [Color("9b5cff"), "☗"], "boss": [Color("c8323f"), "☠"],
+	"tavern": [Color("ffb347"), "☕"], "shop": [Color("23a35f"), "◈"], "dungeon": [Color("9b5cff"), "☗"], "boss": [Color("c8323f"), "☠"],
 }
-const TYPE_NAME := {"riddle": "adivinanza", "logic": "acertijo", "math": "problema", "skill": "reto de habilidad", "star": "estrella", "quest": "misión", "fork": "cruce", "start": "salida"}
+const TYPE_NAME := {"riddle": "adivinanza", "logic": "acertijo", "math": "problema", "skill": "reto de habilidad", "star": "estrella", "quest": "misión", "fork": "cruce", "start": "salida", "shop": "tienda"}
 
 var gold := Color("f2c14e")
 var ink := Color("f4efe2")
@@ -111,6 +131,28 @@ var qpanel: Control
 var lbl_stats: Label
 var bosses := {}
 var d100: HBoxContainer
+var hero_lv := 1
+var hp := 6  # in half hearts
+var hearts_box: HBoxContainer
+var xp := 0
+var lv_pending := 0
+var next_roll := 0
+var fire := false
+var boss_met := {}
+var lines := {}
+var narrator: Control
+var modal: Control
+var lbl_xp: Label
+var bar_xp: ProgressBar
+var btn_bag: Button
+var btn_voice: Button
+var hud: Array = []
+var cine := false
+var cine_spin := 0.0
+var skip_intro := false
+var title_ui: Control
+var bars: Array = []
+var btn_skip: Button
 
 # UI
 var ui: Control
@@ -143,6 +185,7 @@ func _ready() -> void:
 	add_child(world_env)
 	bank = JSON.parse_string(FileAccess.get_file_as_string("res://data/preguntas.json"))
 	quests = JSON.parse_string(FileAccess.get_file_as_string("res://data/misiones.json"))
+	lines = JSON.parse_string(FileAccess.get_file_as_string("res://data/narracion.json"))
 	build_path()
 	build_board()
 	build_bosses()
@@ -154,6 +197,7 @@ func _ready() -> void:
 	set_mode("board")
 	await use_hero(HEROES[0])
 	target = goal
+	show_title()
 
 
 # ---------------------------------------------------------------- helpers
@@ -266,7 +310,7 @@ func build_path() -> void:
 	for a in [[-3, 1, "star"], [-3, 2, "quest"], [-2, 2, "math"], [-1, 2, "logic"], [0, 1, "skill"]]:
 		B.append(add_node(a[0], a[1], a[2], "B"))
 	var tail := []
-	for a in [[1, 0, "riddle"], [2, 0, "star"], [3, 0, "boss"], [4, 0, "quest"], [5, 0, "boss"]]:
+	for a in [[1, 0, "shop"], [2, 0, "star"], [3, 0, "boss"], [4, 0, "quest"], [5, 0, "boss"]]:
 		tail.append(add_node(a[0], a[1], a[2]))
 	path_nodes[main[3]]["boss"] = "troll"
 	path_nodes[tail[2]]["boss"] = "golem"
@@ -830,17 +874,24 @@ func mini_curse(id: String) -> String:
 	boss_anim(id, "Spellcast_Summon")
 	say("%s%s despierta al verte pasar y lanza una maldición. Tira el dado…" % ["¡Un minijefe oculto! " if was_hidden else "", foe_name(id)])
 	await get_tree().create_timer(1.0).timeout
-	var v := randi_range(1, 6)
+	var raw := randi_range(1, 6)
+	var luck: int = attrs["suerte"]
+	var v := mini(6, raw + luck)
 	lbl_dice.visible = true
 	for k in 10:
 		lbl_dice.text = str(randi_range(1, 6))
 		await get_tree().create_timer(0.055).timeout
-	lbl_dice.text = str(v)
-	await get_tree().create_timer(0.7).timeout
+	lbl_dice.text = str(raw) if luck == 0 else "%d + %d" % [raw, luck]
+	await get_tree().create_timer(0.9).timeout
 	lbl_dice.visible = false
 	var out := "stay"
 	var txt := ""
-	if v <= 2:
+	if v <= 4 and items.has("escudo"):
+		items.erase("escudo")
+		txt = "¡tu escudo para la maldición! No te pasa nada."
+		burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
+		v = 0
+	elif v <= 2:
 		if stars > 0:
 			stars -= 1
 			txt = "te roba 1 estrella."
@@ -858,9 +909,10 @@ func mini_curse(id: String) -> String:
 		txt = "¡le caes bien! Te regala 1 estrella."
 		play("Cheer")
 	boss_anim(id, "Taunt" if v < 6 else "Cheer")
-	burst(hero.position + Vector3(0, 1.0, 0), Color("ffd84a") if v == 6 else Color("b48cff"))
+	if v > 0:
+		burst(hero.position + Vector3(0, 1.0, 0), Color("ffd84a") if v == 6 else Color("b48cff"))
 	update_stats()
-	say("%s · dado %d: %s" % [foe_name(id), v, txt])
+	say("%s · dado %s: %s" % [foe_name(id), str(raw) if luck == 0 else "%d+%d" % [raw, luck], txt])
 	await get_tree().create_timer(1.4).timeout
 	boss_anim(id, "Idle")
 	if out == "push":
@@ -1060,6 +1112,17 @@ func boss_fight(id: String) -> void:
 	var b: Dictionary = bosses[id]
 	hero_yaw_goal = atan2(b["home"].x - hero.position.x, b["home"].z - hero.position.z)
 	var is_mini: bool = b.get("mini", false)
+	if not is_mini and not boss_met.has(id):
+		boss_met[id] = true
+		var old := [goal, dist_goal]
+		cine = true
+		goal = b["home"] + Vector3(0, 1.2, 0)
+		dist_goal = 10.0
+		boss_anim(id, "Cheer")
+		narrator.speak("boss_" + id, lines["boss_" + id]["text"], lines["boss_" + id]["who"])
+		await narrator.done
+		cine = false
+		dist_goal = old[1]
 	boss_anim(id, "Taunt" if is_mini else "Cheer")
 	say(("¡%s te reta a un duelo! " if is_mini else "¡%s te cierra el paso! ") % foe_name(id) + "Los dados de porcentaje deciden el desafío…")
 	await get_tree().create_timer(1.0).timeout
@@ -1069,13 +1132,20 @@ func boss_fight(id: String) -> void:
 		if v <= t[0]:
 			tier = t
 			break
-	var dmg: int = tier[2] * (2 if v == 100 else 1)
-	say("%d: desafío de nivel %s. Si aciertas, %d de daño." % [v, ["Aprendiz", "Experto", "Genio", "Maestro"][tier[1]], dmg])
+	var dmg: int = tier[2] * (2 if v == 100 else 1) + attrs["fuerza"]
+	if fire:
+		dmg *= 2
+	var extra := ""
+	if attrs["fuerza"] > 0:
+		extra += " (con tu fuerza)"
+	if fire:
+		extra += " ¡La espada de fuego lo duplica!"
+	say("%d: desafío de nivel %s. Si aciertas, %d de daño%s." % [v, ["Aprendiz", "Experto", "Genio", "Maestro"][tier[1]], dmg, extra])
 	await get_tree().create_timer(1.2).timeout
 	var c := draw(["riddle", "logic", "math", "skill"][randi() % 4], tier[1])
-	qpanel.open(c, tier[1])
-	var good: bool = await qpanel.finished
+	var good: bool = await ask(c, tier[1])
 	if good:
+		fire = false
 		play(hero_def.get("atk", "1H_Melee_Attack_Chop"))
 		await get_tree().create_timer(0.45).timeout
 		boss_anim(id, "Hit_A")
@@ -1087,7 +1157,7 @@ func boss_fight(id: String) -> void:
 		if b["hp"] == 0:
 			await boss_defeated(id)
 			return
-		say("¡Golpe! %s pierde %d %s; le quedan %d." % [foe_name(id), dmg, "corazón" if dmg == 1 else "corazones", b["hp"]])
+		say("¡Golpe! %s pierde %d %s; le quedan %d. +15 de experiencia.%s" % [foe_name(id), dmg, "corazón" if dmg == 1 else "corazones", b["hp"], gain_xp(15)])
 		busy = false
 		btn_act.disabled = false
 		rolls_used = 0
@@ -1100,9 +1170,18 @@ func boss_fight(id: String) -> void:
 	if is_mini and stars > 0:
 		stars -= 1
 		update_stats()
+	# minibosses take half a heart; bosses hit harder the higher the challenge level
+	var halves: int = 1 if is_mini else tier[1] + 1
+	if hurt(halves):
+		await get_tree().create_timer(0.6).timeout
+		boss_anim(id, "Idle")
+		await fall()
+		return
+	say("¡%s te golpea! Pierdes %s." % [foe_name(id), "medio corazón" if halves == 1 else ("%d corazones" % (halves / 2) if halves % 2 == 0 else "%d corazón y medio" % (halves / 2))])
+	await get_tree().create_timer(1.3).timeout
 	busy = false
 	btn_act.disabled = false
-	after_question(false)
+	after_question(false, "", true)
 	boss_anim(id, "Idle")
 
 
@@ -1130,8 +1209,9 @@ func boss_defeated(id: String) -> void:
 	var reward := 2 if b.get("mini", false) else 3
 	boss_anim(id, "Death_C_Skeletons" if b.get("mini", false) else "Death_A")
 	stars += reward
+	var xpw := 30 if b.get("mini", false) else 60
+	say("¡Has vencido a %s! +%d estrellas y %d de experiencia.%s" % [foe_name(id), reward, xpw, gain_xp(xpw)])
 	update_stats()
-	say("¡Has vencido a %s! +%d estrellas." % [foe_name(id), reward])
 	play("Cheer")
 	await get_tree().create_timer(1.4).timeout
 	var tw := create_tween()
@@ -1153,6 +1233,16 @@ func boss_defeated(id: String) -> void:
 func victory() -> void:
 	play("Cheer")
 	say("¡Habéis vencido al Dragón Carmesí y salvado el reino! Total: %d estrellas." % stars)
+	cine = true
+	cine_spin = 0.12
+	goal = castle_pos + Vector3(0, 2.0, 0)
+	dist_goal = 22.0
+	msg.visible = false
+	narrator.speak("final", lines["final"]["text"], lines["final"]["who"])
+	await narrator.done
+	cine = false
+	cine_spin = 0.0
+	msg.visible = true
 	offer("Jugar otra vez", func(): get_tree().reload_current_scene())
 
 
@@ -1201,6 +1291,14 @@ func build_npcs() -> void:
 	var bru := npc(roots["dungeon"], "Barbarian", ["1H_Axe", "Barbarian_Hat"], Color(1.0, 0.9, 0.7), Vector3(-3.2, 0, 1.5), Vector3(0, 0, 4.6), 0.72, "Brunilda")
 	bru.scale = Vector3(0.8, 0.62, 0.8)
 	npcs["mina"] = bru
+	var shop_p: Vector3 = Vector3.ZERO
+	for n in path_nodes:
+		if n["type"] == "shop":
+			shop_p = n["p"]
+	var rem := npc(roots["board"], "Rogue", ["Rogue_Cape"], Color(0.8, 1.15, 0.85), hpos(SHOP_NPC.x, SHOP_NPC.y), shop_p, 0.5, "Remigio")
+	var rl: Label3D = rem.get_meta("label")
+	rl.text = "◈  Remigio · tienda"
+	rl.modulate = Color("8ff0b4")
 
 
 func test_label(t: Dictionary) -> String:
@@ -1242,8 +1340,11 @@ func run_quest(id: String) -> void:
 		if chapters.size() > 0 and chap < chapters.size() - 1:
 			rw_txt = "Cada capítulo superado os acerca al final. " + rw_txt.replace("Recompensa:", "Recompensa final:")
 		questbox.show_intro(zone, title, giver["name"], part["text"], opts, rw_txt)
+		narrator.speak("q_%s_%d" % [id, chap], part["text"])
 		var k: int = await questbox.chosen
+		narrator.stop()
 		var ch: Dictionary = part["choices"][k]
+		var clip := "q_%s_%d_%d_" % [id, chap, k]
 		var t: Dictionary = ch["test"]
 		var ok := false
 		var paid := false
@@ -1261,13 +1362,14 @@ func run_quest(id: String) -> void:
 			var c := draw(t["card"])
 			if t.has("game"):
 				c["game"] = GAME_FOR.get(t["game"], "memoria")
-			qpanel.open(c, level)
-			ok = await qpanel.finished
+			ok = await ask(c, level)
 		if ok and chapters.size() > 0 and chap < chapters.size() - 1:
 			qprog[id] = chap + 1
-			notes.append("Capítulo %d superado." % (chap + 1))
+			notes.append("Capítulo %d superado. +15 de experiencia.%s" % [chap + 1, gain_xp(15)])
 			questbox.show_result(true, "¡Capítulo superado!", ch["win"], notes, "Siguiente capítulo")
+			narrator.speak(clip + "si", ch["win"])
 			await questbox.closed
+			narrator.stop()
 			continue
 		if ok:
 			var rw: Dictionary = q["reward"]
@@ -1275,22 +1377,31 @@ func run_quest(id: String) -> void:
 				stars += int(rw["stars"])
 				notes.append("+%d ★" % rw["stars"])
 			if rw.has("item"):
-				items.append(rw["item"])
-				notes.append("Objeto: %s" % ITEM_NAME[rw["item"]])
+				if items.size() < MAX_ITEMS:
+					items.append(rw["item"])
+					notes.append("Objeto: %s" % ITEM_NAME[rw["item"]])
+				else:
+					stars += int(ITEMS[rw["item"]][0])
+					notes.append("Tu bolsa está llena: cambias el objeto (%s) por %d ★" % [ITEM_NAME[rw["item"]], ITEMS[rw["item"]][0]])
 			if rw.has("attr"):
 				attrs[rw["attr"]] += 1
 				relics.append(rw.get("relic", ""))
 				notes.append("%s: +1 de %s" % [rw.get("relic", "Reliquia"), ATTR_NAME[rw["attr"]]])
+			var rxp: int = int(rw.get("xp", 30))
+			notes.append("+%d de experiencia.%s" % [rxp, gain_xp(rxp)])
 			quests_done[id] = true
 			quest_done_fx(id)
 			play("Cheer")
 		else:
-			notes.append("La misión sigue pendiente: podéis volver a intentarlo.")
+			notes.append("La misión sigue pendiente: podéis volver a intentarlo. +2 de experiencia.%s" % gain_xp(2))
 			if chapters.size() > 0:
 				notes.append("No perdéis los capítulos ya superados.")
 		update_stats()
 		questbox.show_result(ok, "¡Misión cumplida!" if ok else "No ha salido bien", ch["win"] if ok else ch.get("lose", ""), notes, "Continuar")
+		if ok or ch.get("lose", "") != "":
+			narrator.speak(clip + ("si" if ok else "no"), ch["win"] if ok else ch["lose"])
 		await questbox.closed
+		narrator.stop()
 		break
 	busy = false
 	btn_act.disabled = false
@@ -1431,6 +1542,131 @@ func update_stats() -> void:
 	for i in 3:
 		dots += "●" if i >= rolls_used else "○"
 	lbl_stats.text = "%s · %d ★ · Tiradas %s" % [["Aprendiz", "Experto", "Genio", "Maestro"][level], stars, dots]
+	if lbl_xp:
+		var need := xp_need(hero_lv)
+		lbl_xp.text = "Nv %d   FUE %d · SAB %d · SUE %d" % [hero_lv, attrs["fuerza"], attrs["sabiduria"], attrs["suerte"]]
+		bar_xp.value = 100.0 if hero_lv >= MAX_LV else 100.0 * xp / need
+		bar_xp.tooltip_text = "Experiencia %d / %d" % [xp, need]
+		btn_bag.text = "Bolsa  %d/%d" % [items.size(), MAX_ITEMS]
+		draw_hearts()
+
+
+func max_hp() -> int:
+	return 2 * (3 + (hero_lv - 1) / 3)
+
+
+func draw_hearts() -> void:
+	var n := max_hp() / 2
+	while hearts_box.get_child_count() < n:
+		var cell := Control.new()
+		cell.custom_minimum_size = Vector2(26, 26)
+		for k in 2:
+			var holder := Control.new()
+			holder.clip_contents = true
+			holder.size = Vector2(26, 28)
+			var l := Label.new()
+			l.text = "♥"
+			l.add_theme_font_size_override("font_size", 24)
+			l.add_theme_color_override("font_color", Color(1, 1, 1, 0.22) if k == 0 else Color("ff4d5e"))
+			l.position = Vector2(0, -4)
+			holder.add_child(l)
+			cell.add_child(holder)
+		hearts_box.add_child(cell)
+	for i in hearts_box.get_child_count():
+		var cell: Control = hearts_box.get_child(i)
+		cell.visible = i < n
+		var fill := clampi(hp - i * 2, 0, 2)
+		cell.get_child(1).size.x = 13.0 * fill
+	hearts_box.tooltip_text = "Vida: %s de %d corazones" % [str(hp / 2.0).replace(".5", " y medio").replace(".0", ""), n]
+
+
+## Takes half hearts away. Returns true when the hero falls.
+func hurt(halves: int) -> bool:
+	hp = maxi(0, hp - halves)
+	damage_pop(hero.position + Vector3(0, 2.2, 0), "-%s♥" % ("½" if halves == 1 else str(halves / 2.0).replace(".5", "½").replace(".0", "")))
+	update_stats()
+	return hp == 0
+
+
+func heal(halves: int) -> void:
+	hp = mini(max_hp(), hp + halves)
+	update_stats()
+
+
+## The hero has no hearts left. An Elixir de vida lifts them at once; otherwise, with no companion on
+## the same square (cooperative play is still to come), Doña Petra carries them to the inn.
+func fall() -> void:
+	busy = true
+	btn_act.disabled = true
+	play("Death_A")
+	say("¡%s se queda sin corazones y cae al suelo!" % hero_def["name"])
+	await get_tree().create_timer(2.0).timeout
+	if items.has("elixir"):
+		items.erase("elixir")
+		burst(hero.position + Vector3(0, 1.0, 0), Color("ff7a9a"))
+		heal(4)
+		play("Cheer")
+		say("¡El Elixir de vida brilla y %s se levanta con 2 corazones!" % hero_def["name"])
+		await get_tree().create_timer(1.6).timeout
+	else:
+		var lost := mini(stars, 2)
+		stars -= lost
+		await fade_to(1.0)
+		var inn := 0
+		for i in path_nodes.size():
+			if path_nodes[i]["type"] == "tavern":
+				inn = i
+		hero_at = inn
+		trail.clear()
+		hero.position = path_nodes[inn]["p"]
+		hp = maxi(2, max_hp() / 2)
+		update_stats()
+		play("Idle")
+		await fade_to(0.0)
+		say("Doña Petra te ha recogido y curado en la posada (pierdes %d ★). Vuelves con %d corazones. Con un Elixir de vida, o con un compañero a tu lado, no tendrás que volver." % [lost, hp / 2])
+	play("Idle")
+	busy = false
+	btn_act.disabled = false
+	rolls_used = 0
+	update_stats()
+	offer()
+
+
+func xp_need(lv: int) -> int:
+	return 30 + lv * 20
+
+
+## Adds experience and returns a note for the message ("¡Subes al nivel 3!") when the hero levels up.
+func gain_xp(n: int) -> String:
+	if hero_lv >= MAX_LV:
+		return ""
+	xp += n
+	var ups := 0
+	while hero_lv < MAX_LV and xp >= xp_need(hero_lv):
+		xp -= xp_need(hero_lv)
+		hero_lv += 1
+		ups += 1
+		hp = mini(max_hp(), hp + 2)
+	lv_pending += ups
+	update_stats()
+	return " ¡Subes al nivel %d!" % hero_lv if ups > 0 else ""
+
+
+func level_up() -> void:
+	while lv_pending > 0:
+		var rows := []
+		for id in ATTR_INFO:
+			rows.append({"id": id, "name": "%s   (tienes %d, pasarás a %d)" % [ATTR_NAME[id], attrs[id], attrs[id] + 1], "desc": ATTR_INFO[id][1], "button": "Mejorar"})
+		modal.open("¡%s sube al nivel %d!" % [hero_def["name"], hero_lv - lv_pending + 1], "Te has hecho más fuerte. Elige en qué quieres mejorar:", rows, "", load("res://assets/art/%s.jpg" % hero_def["art"]))
+		narrator.speak("nivel", "")
+		var id: String = await modal.picked
+		modal.visible = false
+		narrator.stop()
+		attrs[id] += 1
+		lv_pending -= 1
+		burst(hero.position + Vector3(0, 1.2, 0), Color("ffd84a"))
+		update_stats()
+		say("¡%s mejora! Ahora tienes %d de %s." % [hero_def["name"], attrs[id], ATTR_NAME[id]])
 
 
 # ---------------------------------------------------------------- flow
@@ -1443,6 +1679,14 @@ func offer(label := "", fn := Callable()) -> void:
 	offer_fn = fn
 	btn_act.text = label if label != "" else "Tirar el dado"
 	_on_resize.call_deferred()
+	if lv_pending > 0 and not modal.visible:
+		level_up.call_deferred()
+
+
+## Opens a question with the hero's bonuses and bag, and waits for the answer.
+func ask(c: Dictionary, lvl: int) -> bool:
+	qpanel.open(c, lvl, attrs["sabiduria"] * 5.0, items)
+	return await qpanel.finished
 
 
 func on_act() -> void:
@@ -1460,6 +1704,16 @@ func roll_dice() -> void:
 	busy = true
 	btn_act.disabled = true
 	var v := randi_range(1, 6)
+	var shown := str(v)
+	if next_roll == -1:
+		var v2 := randi_range(1, 6)
+		shown = "%d + %d" % [v, v2]
+		v += v2
+	elif next_roll > 0:
+		v = next_roll
+		shown = str(v)
+	var how: String = ["", " con el dado doble", " con el dado trucado"][0 if next_roll == 0 else (1 if next_roll == -1 else 2)]
+	next_roll = 0
 	last_roll = v
 	rolls_used += 1
 	update_stats()
@@ -1467,11 +1721,11 @@ func roll_dice() -> void:
 	for k in 10:
 		lbl_dice.text = str(randi_range(1, 6))
 		await get_tree().create_timer(0.055).timeout
-	lbl_dice.text = str(v)
+	lbl_dice.text = shown
 	lbl_dice.scale = Vector2(0.3, 0.3)
 	var tw := create_tween()
 	tw.tween_property(lbl_dice, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	say("¡Has sacado un %d!" % v)
+	say("¡Has sacado un %d%s!" % [v, how])
 	await get_tree().create_timer(0.8).timeout
 	lbl_dice.visible = false
 	var n := hero_at
@@ -1489,6 +1743,9 @@ func roll_dice() -> void:
 		hero_at = n
 		if boss_alive(n):
 			break
+		if s < v - 1 and path_nodes[n]["type"] == "shop":
+			play("Idle")
+			await open_shop()
 		if s < v - 1 and mini_alive(n):
 			var res: String = await mini_curse(path_nodes[n]["mini"])
 			if res == "push":
@@ -1531,11 +1788,18 @@ func landed(n: int) -> void:
 		"riddle", "logic", "math", "skill":
 			busy = true
 			btn_act.disabled = true
-			qpanel.open(draw(t), level)
-			var good: bool = await qpanel.finished
+			var good: bool = await ask(draw(t), level)
 			busy = false
 			btn_act.disabled = false
-			after_question(good)
+			after_question(good, t)
+		"shop":
+			busy = true
+			btn_act.disabled = true
+			await open_shop()
+			busy = false
+			btn_act.disabled = false
+			say("Sales de la tienda de Remigio. ¡Tira el dado!")
+			end_turn_or_continue()
 		"quest":
 			var qid := quest_at(n)
 			if qid != "" and not quests_done.has(qid):
@@ -1553,22 +1817,33 @@ func landed(n: int) -> void:
 			end_turn_or_continue()
 
 
-func after_question(good: bool) -> void:
+func after_question(good: bool, cat := "", xp_wrong := true) -> void:
 	if good:
 		stars += 1
 		play("Cheer")
+		var amount := 15 if cat == "skill" else 10
+		var up := gain_xp(amount)
 		update_stats()
 		if rolls_used < 3:
-			say("¡Muy bien! +1 estrella. Puedes volver a tirar (%d de 3)." % (rolls_used + 1))
+			say("¡Muy bien! +1 estrella y %d de experiencia.%s Puedes volver a tirar (%d de 3)." % [amount, up, rolls_used + 1])
 			offer()
 		else:
-			say("¡Muy bien! +1 estrella. Ya has usado tus 3 tiradas: empieza un turno nuevo.")
+			say("¡Muy bien! +1 estrella y %d de experiencia.%s Ya has usado tus 3 tiradas: empieza un turno nuevo." % [amount, up])
 			rolls_used = 0
 			update_stats()
 			offer()
 		return
 	play("Hit_A")
-	say("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"] if last_roll > 0 else "¡Vaya! Esta vez no ha salido bien.")
+	var up := gain_xp(2) if xp_wrong else ""
+	if items.has("escudo") and last_roll > 0:
+		items.erase("escudo")
+		burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
+		rolls_used = 0
+		update_stats()
+		say("¡Tu escudo te protege y no retrocedes! +2 de experiencia por intentarlo.%s" % up)
+		offer()
+		return
+	say(("¡Vaya! Retrocedes %d casilla%s." % [last_roll, "" if last_roll == 1 else "s"] if last_roll > 0 else "¡Vaya! Esta vez no ha salido bien.") + (" +2 de experiencia por intentarlo." if xp_wrong else "") + up)
 	busy = true
 	btn_act.disabled = true
 	await get_tree().create_timer(0.8).timeout
@@ -1668,10 +1943,12 @@ func enter(where: String) -> void:
 func interior_offer() -> void:
 	if mode == "tavern":
 		if not quests_done.has("posada"):
-			say("La Posada del Grifo huele a pan caliente… pero Doña Petra parece preocupada.")
+			heal(max_hp())
+			say("La Posada del Grifo huele a pan caliente y recuperas todos tus corazones… pero Doña Petra parece preocupada.")
 			offer("Hablar con Doña Petra", run_quest.bind("posada"))
 		else:
-			say("La Posada del Grifo está tranquila. Doña Petra os sirve tarta gratis.")
+			heal(max_hp())
+			say("La Posada del Grifo está tranquila. Doña Petra os sirve tarta y recuperas todos tus corazones.")
 			offer("Salir", leave)
 	elif mode == "dungeon":
 		if not quests_done.has("mina"):
@@ -1768,6 +2045,306 @@ func fade_to(a: float) -> void:
 	await tw.finished
 
 
+# ---------------------------------------------------------------- shop and bag
+func open_shop() -> void:
+	hero_yaw_goal = atan2(hpos(SHOP_NPC.x, SHOP_NPC.y).x - hero.position.x, hpos(SHOP_NPC.x, SHOP_NPC.y).z - hero.position.z)
+	if stars < 2:
+		narrator.speak("tienda_pobre", "")
+		say("Remigio el buhonero te enseña sus cosas, pero no tienes estrellas suficientes.")
+		await get_tree().create_timer(2.2).timeout
+		return
+	narrator.speak("tienda", "")
+	while true:
+		var rows := []
+		for id in ITEMS:
+			var it: Array = ITEMS[id]
+			rows.append({"id": id, "name": ITEM_NAME[id], "desc": it[2], "button": "%d ★" % it[0], "enabled": stars >= it[0] and items.size() < MAX_ITEMS})
+		var bag := "Tu bolsa está vacía." if items.is_empty() else "En tu bolsa: " + ", ".join(items.map(func(x): return ITEM_NAME[x]))
+		modal.open("La tienda de Remigio", "%s · %d ★ · objetos %d/%d. %s" % [hero_def["name"], stars, items.size(), MAX_ITEMS, bag], rows, "Salir de la tienda", load("res://assets/art/merchant.jpg") if ResourceLoader.exists("res://assets/art/merchant.jpg") else null)
+		var r: Array = await _modal_result()
+		if r[0] == "":
+			break
+		var id: String = r[0]
+		if stars >= ITEMS[id][0] and items.size() < MAX_ITEMS:
+			stars -= int(ITEMS[id][0])
+			items.append(id)
+			coins_at(hero.position + Vector3(0, 1.4, 0))
+			update_stats()
+	narrator.stop()
+	modal.visible = false
+
+
+## Waits for either a row (returns [id]) or the close button (returns [""]).
+func _modal_result() -> Array:
+	var out := []
+	var f1 := func(id): out.append(id)
+	var f2 := func(): out.append("")
+	modal.picked.connect(f1, CONNECT_ONE_SHOT)
+	modal.closed.connect(f2, CONNECT_ONE_SHOT)
+	while out.is_empty():
+		await get_tree().process_frame
+	if modal.picked.is_connected(f1):
+		modal.picked.disconnect(f1)
+	if modal.closed.is_connected(f2):
+		modal.closed.disconnect(f2)
+	return out
+
+
+func open_bag() -> void:
+	if busy or modal.visible:
+		return
+	var rows := []
+	var seen := {}
+	for id in items:
+		if seen.has(id):
+			continue
+		seen[id] = true
+		var when: String = ITEMS[id][1]
+		var n := items.count(id)
+		var can := when == "r" and mode == "board" and offer_fn.is_null()
+		var btn := "Usar" if when == "r" else ("En preguntas" if when == "q" else "Automático")
+		rows.append({"id": id, "name": ITEM_NAME[id] + (" ×%d" % n if n > 1 else ""), "desc": ITEMS[id][2], "button": btn, "enabled": can})
+	var rel := "" if relics.is_empty() else " Reliquias: " + ", ".join(relics.filter(func(x): return x != "")) + "."
+	modal.open("Bolsa de %s" % hero_def["name"], ("Llevas %d de %d objetos." % [items.size(), MAX_ITEMS] if not items.is_empty() else "Tu bolsa está vacía. Compra objetos en la tienda de Remigio (◈) o gánalos en las misiones.") + rel, rows, "Cerrar", load("res://assets/art/%s.jpg" % hero_def["art"]))
+	var r: Array = await _modal_result()
+	modal.visible = false
+	if r[0] != "":
+		use_item(r[0])
+
+
+func use_item(id: String) -> void:
+	match id:
+		"doble":
+			items.erase(id)
+			next_roll = -1
+			say("Dado doble preparado: tu próxima tirada suma dos dados.")
+		"pocion":
+			if hp >= max_hp():
+				say("Ya tienes todos los corazones: guarda la poción para luego.")
+				return
+			items.erase(id)
+			heal(2)
+			burst(hero.position + Vector3(0, 1.0, 0), Color("ff7a9a"))
+			say("Te bebes la poción: recuperas 1 corazón.")
+		"espada":
+			items.erase(id)
+			fire = true
+			say("¡La espada arde! Tu próximo golpe acertado hará el doble de daño.")
+		"trucado":
+			var n: int = await pick_options("¿Qué número quieres sacar?", ["1", "2", "3", "4", "5", "6"])
+			if n < 0:
+				return
+			items.erase(id)
+			next_roll = n + 1
+			say("Dado trucado: tu próxima tirada será un %d." % next_roll)
+		"portal":
+			var dest := ["tavern", "dungeon", "shop"]
+			var n: int = await pick_options("¿Adónde quieres viajar?", ["Posada del Grifo", "Entrada de la mina", "Tienda de Remigio"])
+			if n < 0:
+				return
+			items.erase(id)
+			var to := 0
+			for i in path_nodes.size():
+				if path_nodes[i]["type"] == dest[n]:
+					to = i
+			burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
+			trail.append(hero_at)
+			hero_at = to
+			hero.position = path_nodes[to]["p"]
+			burst(hero.position + Vector3(0, 1.0, 0), Color("9fd6ff"))
+			update_stats()
+			landed(to)
+			return
+	update_stats()
+
+
+## Shows a row of big buttons and returns the index chosen (or -1 for «Cancelar»).
+func pick_options(question: String, labels: Array) -> int:
+	for c in box_choices.get_children():
+		c.queue_free()
+	box_choices.visible = true
+	var out := []
+	for i in labels.size():
+		var b := big_button(labels[i])
+		b.custom_minimum_size.x = 96 if labels[i].length() < 3 else 0
+		b.pressed.connect(func(): out.append(i))
+		box_choices.add_child(b)
+	var c := Button.new()
+	c.text = "Cancelar"
+	c.custom_minimum_size = Vector2(0, 64)
+	c.pressed.connect(func(): out.append(-1))
+	box_choices.add_child(c)
+	say(question)
+	_on_resize.call_deferred()
+	while out.is_empty():
+		await get_tree().process_frame
+	box_choices.visible = false
+	return out[0]
+
+
+func coins_at(at: Vector3) -> void:
+	burst(at, Color("ffd34a"))
+
+
+# ---------------------------------------------------------------- title and intro
+const SHOTS := [
+	{"at": "castle", "dist": 20.0, "yaw": 0.9, "pitch": 1.02, "spin": 0.05},
+	{"at": "dragon", "dist": 9.0, "yaw": 1.7, "pitch": 1.12, "spin": 0.08},
+	{"at": "troll", "dist": 9.0, "yaw": 0.4, "pitch": 1.08, "spin": 0.06, "then": "golem", "then_at": 0.5},
+	{"at": "esbirro", "dist": 8.0, "yaw": -0.4, "pitch": 1.1, "spin": 0.08},
+	{"at": "hero", "dist": 9.0, "yaw": -0.6, "pitch": 1.0, "spin": 0.1},
+]
+
+
+func shot_pos(k: String) -> Vector3:
+	if k == "castle":
+		return castle_pos + Vector3(0, 2.0, 0)
+	if k == "hero":
+		return hero.position + Vector3(0, 0.8, 0)
+	return bosses[k]["home"] + Vector3(0, 1.2, 0)
+
+
+func set_hud(on: bool) -> void:
+	for n in hud:
+		n.visible = on
+	box_visit.visible = on and mode == "board"
+	_on_resize.call_deferred()
+
+
+func show_title() -> void:
+	set_hud(false)
+	cine = true
+	cine_spin = 0.06
+	goal = Vector3(0, 0, 0)
+	dist_goal = 30.0
+	pitch = 0.85
+	title_ui.visible = true
+
+
+func start_game(with_intro: bool) -> void:
+	title_ui.visible = false
+	if with_intro:
+		await play_intro()
+	cine = false
+	cine_spin = 0.0
+	yaw = 0.35
+	pitch = 0.95
+	dist_goal = 15.0
+	set_hud(true)
+	say("¡Bienvenidos al reino! Tirad el dado para avanzar por el camino.")
+	offer()
+
+
+func play_intro() -> void:
+	skip_intro = false
+	for b in bars:
+		b.visible = true
+	btn_skip.visible = true
+	_on_resize()
+	for k in SHOTS.size():
+		if skip_intro:
+			break
+		var sh: Dictionary = SHOTS[k]
+		goal = shot_pos(sh["at"])
+		dist_goal = sh["dist"]
+		cine_spin = sh["spin"]
+		var tw := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		tw.tween_property(self, "yaw", sh["yaw"], 2.2)
+		tw.parallel().tween_property(self, "pitch", sh["pitch"], 2.2)
+		var shown := false
+		if sh["at"] == "esbirro" and not bosses["esbirro"]["awake"]:
+			bosses["esbirro"]["model"].visible = true
+			boss_anim("esbirro", "Spawn_Ground_Skeletons")
+			shown = true
+		var id := "intro_%d" % (k + 1)
+		narrator.speak(id, lines[id]["text"], lines[id]["who"])
+		if sh.has("then"):
+			var nxt: String = sh["then"]
+			var dur := 6.0
+			if narrator.player.stream and narrator.player.playing:
+				dur = narrator.player.stream.get_length()
+			get_tree().create_timer(dur * sh["then_at"]).timeout.connect(func():
+				if not skip_intro:
+					goal = shot_pos(nxt))
+		await narrator.done
+		if shown:
+			bosses["esbirro"]["model"].visible = false
+		if not skip_intro:
+			await get_tree().create_timer(0.35).timeout
+	for b in bars:
+		b.visible = false
+	btn_skip.visible = false
+
+
+func build_title() -> void:
+	title_ui = Control.new()
+	title_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ui.add_child(title_ui)
+	var shade := ColorRect.new()
+	shade.color = Color(0.02, 0.02, 0.07, 0.35)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_ui.add_child(shade)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 14)
+	col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	title_ui.add_child(col)
+	var pre := Label.new()
+	pre.text = "ES GAMES presenta"
+	pre.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	pre.add_theme_font_override("font", font_head)
+	pre.add_theme_font_size_override("font_size", 28)
+	pre.add_theme_color_override("font_color", Color("e9d7b0"))
+	col.add_child(pre)
+	var t := Label.new()
+	t.text = "El Camino de los Enigmas"
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.add_theme_font_override("font", font_epic)
+	t.add_theme_font_size_override("font_size", 92)
+	t.add_theme_color_override("font_color", Color("ffd27a"))
+	t.add_theme_color_override("font_outline_color", Color("2a1204"))
+	t.add_theme_constant_override("outline_size", 18)
+	col.add_child(t)
+	var sub := Label.new()
+	sub.text = "Un reino de adivinanzas, acertijos y retos. Solo una mente despierta lo salvará."
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.add_theme_font_size_override("font_size", 22)
+	sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
+	sub.add_theme_constant_override("outline_size", 6)
+	col.add_child(sub)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 18)
+	col.add_child(row)
+	var go := big_button("  Empezar la aventura  ")
+	go.pressed.connect(start_game.bind(true))
+	row.add_child(go)
+	var quick := Button.new()
+	quick.text = "Jugar sin la historia"
+	quick.custom_minimum_size = Vector2(0, 64)
+	quick.add_theme_font_size_override("font_size", 22)
+	quick.pressed.connect(start_game.bind(false))
+	row.add_child(quick)
+	title_ui.visible = false
+	for i in 2:
+		var bar := ColorRect.new()
+		bar.color = Color.BLACK
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		bar.visible = false
+		ui.add_child(bar)
+		bars.append(bar)
+	btn_skip = Button.new()
+	btn_skip.text = "Saltar  ▸▸"
+	btn_skip.custom_minimum_size = Vector2(150, 52)
+	btn_skip.add_theme_font_size_override("font_size", 22)
+	btn_skip.visible = false
+	btn_skip.pressed.connect(func():
+		skip_intro = true
+		narrator.stop())
+	ui.add_child(btn_skip)
+
+
 # ---------------------------------------------------------------- per frame
 func _process(dt: float) -> void:
 	var t := Time.get_ticks_msec() / 1000.0
@@ -1780,8 +2357,10 @@ func _process(dt: float) -> void:
 	if hero:
 		hero_yaw += wrapf(hero_yaw_goal - hero_yaw, -PI, PI) * minf(1.0, dt * 10.0)
 		hero.rotation.y = hero_yaw
-		if mode == "board":
+		if mode == "board" and not cine:
 			goal = hero.position + Vector3(0, 0.6, 0)
+	if cine:
+		yaw += cine_spin * dt
 	if mode == "board":
 		for i in markers.size():
 			markers[i]["ic"].position.y = 0.95 + sin(t * 2.2 + i) * 0.08
@@ -1804,6 +2383,17 @@ func _unhandled_input(e: InputEvent) -> void:
 	# testing shortcuts on a keyboard: 1 riddle, 2 logic, 3 problem, 4-6 skill games
 	if e is InputEventKey and e.pressed and not busy and mode == "board":
 		var k: int = e.keycode - KEY_1
+		if e.keycode == KEY_0:
+			stars += 10
+			update_stats()
+			busy = true
+			await open_shop()
+			busy = false
+			return
+		if e.keycode == KEY_L:
+			gain_xp(60)
+			offer()
+			return
 		if k == 8:
 			run_quest("invierno")
 			return
@@ -1826,10 +2416,9 @@ func _unhandled_input(e: InputEvent) -> void:
 			var c := draw(["riddle", "logic", "math", "skill", "skill", "skill"][k])
 			if k >= 3:
 				c["game"] = ["memoria", "simon", "faroles"][k - 3]
-			qpanel.open(c, level)
-			var good: bool = await qpanel.finished
+			var good: bool = await ask(c, level)
 			busy = false
-			after_question(good)
+			after_question(good, c["cat"])
 			return
 	if e is InputEventScreenTouch:
 		if e.pressed:
@@ -1938,6 +2527,10 @@ func build_ui() -> void:
 	lbl_stats.add_theme_font_size_override("font_size", 19)
 	lbl_stats.add_theme_color_override("font_color", Color("c9cde0"))
 	col.add_child(lbl_stats)
+	hearts_box = HBoxContainer.new()
+	hearts_box.add_theme_constant_override("separation", 2)
+	hearts_box.mouse_filter = Control.MOUSE_FILTER_PASS
+	col.add_child(hearts_box)
 	var lv := OptionButton.new()
 	for name in ["Aprendiz · 6 a 8 años", "Experto · 8 a 10 años", "Genio · 10 a 13 años", "Maestro · adultos"]:
 		lv.add_item(name)
@@ -1947,6 +2540,24 @@ func build_ui() -> void:
 		level = i
 		update_stats())
 	col.add_child(lv)
+	lbl_xp = Label.new()
+	lbl_xp.add_theme_font_override("font", font_bold)
+	lbl_xp.add_theme_font_size_override("font_size", 17)
+	lbl_xp.add_theme_color_override("font_color", Color("ffe7b8"))
+	col.add_child(lbl_xp)
+	bar_xp = ProgressBar.new()
+	bar_xp.show_percentage = false
+	bar_xp.custom_minimum_size = Vector2(0, 8)
+	var xfill := StyleBoxFlat.new()
+	xfill.bg_color = Color("8fd6ff")
+	xfill.set_corner_radius_all(4)
+	var xbg := StyleBoxFlat.new()
+	xbg.bg_color = Color(1, 1, 1, 0.12)
+	xbg.set_corner_radius_all(4)
+	bar_xp.add_theme_stylebox_override("fill", xfill)
+	bar_xp.add_theme_stylebox_override("background", xbg)
+	col.add_child(bar_xp)
+	hud.append(card)
 
 	# hero picker
 	picker = HBoxContainer.new()
@@ -1964,6 +2575,22 @@ func build_ui() -> void:
 			if not busy:
 				use_hero(def))
 		picker.add_child(b)
+	hud.append(picker)
+
+	btn_bag = Button.new()
+	btn_bag.custom_minimum_size = Vector2(150, 50)
+	btn_bag.add_theme_font_size_override("font_size", 20)
+	btn_bag.pressed.connect(open_bag)
+	ui.add_child(btn_bag)
+	hud.append(btn_bag)
+	btn_voice = Button.new()
+	btn_voice.text = "🔊 Voz"
+	btn_voice.custom_minimum_size = Vector2(110, 50)
+	btn_voice.add_theme_font_size_override("font_size", 20)
+	btn_voice.pressed.connect(func():
+		narrator.set_muted(not narrator.muted)
+		btn_voice.text = "🔇 Sin voz" if narrator.muted else "🔊 Voz")
+	ui.add_child(btn_voice)
 
 	# bottom-left: places
 	box_visit = HBoxContainer.new()
@@ -1985,6 +2612,7 @@ func build_ui() -> void:
 	msg_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(msg_panel)
 	msg = msg_panel
+	hud.append(msg_panel)
 	lbl_msg = Label.new()
 	lbl_msg.text = "¡Bienvenidos al reino! Tirad el dado para avanzar por el camino."
 	lbl_msg.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1997,6 +2625,7 @@ func build_ui() -> void:
 	btn_act = big_button("Tirar el dado")
 	btn_act.pressed.connect(on_act)
 	ui.add_child(btn_act)
+	hud.append(btn_act)
 
 	# fork choices
 	box_choices = HBoxContainer.new()
@@ -2060,7 +2689,16 @@ func build_ui() -> void:
 	questbox = preload("res://quest_box.gd").new()
 	ui.add_child(questbox)
 	questbox.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
+	modal = preload("res://modal_box.gd").new()
+	ui.add_child(modal)
+	modal.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
+	qpanel.item_used.connect(func(_id): update_stats())
 	ui.move_child(qpanel, -1)
+	narrator = preload("res://narrator.gd").new()
+	ui.add_child(narrator)
+	narrator.setup({"head": font_head, "bold": font_bold, "epic": font_epic, "body": font_body})
+	build_title()
+	ui.move_child(btn_voice, -1)
 
 	fade = ColorRect.new()
 	fade.color = Color(0, 0, 0, 0)
@@ -2092,3 +2730,17 @@ func _on_resize() -> void:
 	d100.position = Vector2((sz.x - d100.size.x) * 0.5, sz.y * 0.13)
 	box_choices.reset_size()
 	box_choices.position = (sz - box_choices.size) * 0.5
+	btn_bag.reset_size()
+	btn_bag.position = Vector2(sz.x - btn_bag.size.x - m, picker.position.y + picker.size.y + 10)
+	btn_voice.reset_size()
+	btn_voice.position = Vector2(btn_bag.position.x - btn_voice.size.x - 10, btn_bag.position.y)
+	if not btn_bag.visible:
+		btn_voice.position = Vector2(sz.x - btn_voice.size.x - m, 18)
+	var bh := sz.y * 0.085
+	if bars.size() == 2:
+		bars[0].position = Vector2.ZERO
+		bars[0].size = Vector2(sz.x, bh)
+		bars[1].position = Vector2(0, sz.y - bh)
+		bars[1].size = Vector2(sz.x, bh)
+		btn_skip.reset_size()
+		btn_skip.position = Vector2(sz.x - btn_skip.size.x - m, sz.y - btn_skip.size.y - 12)

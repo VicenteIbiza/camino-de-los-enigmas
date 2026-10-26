@@ -1,0 +1,50 @@
+{
+ "intro_1": {
+  "who": "El Cronista",
+  "text": "Hace mucho tiempo, cuando los caminos aún no tenían nombre, este reino vivía en paz. En lo alto del castillo brillaba la Biblioteca del Saber, y quien tuviera una pregunta, allí encontraba su respuesta."
+ },
+ "intro_2": {
+  "who": "El Cronista",
+  "text": "Pero una noche de tormenta llegó el Dragón Carmesí. Se adueñó del castillo, apagó una a una las luces de la biblioteca… y llenó los caminos de trampas, acertijos y preguntas sin respuesta."
+ },
+ "intro_3": {
+  "who": "El Cronista",
+  "text": "Desde entonces, el Trol del Puente vigila la entrada del bosque. Y más adelante, el Gólem de Cristal guarda el camino que lleva al castillo. Nadie ha conseguido pasar."
+ },
+ "intro_4": {
+  "who": "El Cronista",
+  "text": "Y no os fiéis de las casillas tranquilas. En algunas duermen esqueletos que se despiertan en cuanto alguien pasa de largo."
+ },
+ "intro_5": {
+  "who": "El Cronista",
+  "text": "Por eso os hemos llamado a vosotros. No hace falta la espada más afilada, sino la mente más despierta. Si pensáis con calma y os ayudáis unos a otros, el reino volverá a brillar. ¿Preparados? Empieza la aventura."
+ },
+ "boss_troll": {
+  "who": "El Cronista",
+  "text": "Bajo el puente asoma el Trol, enorme y gruñón. Nadie cruza sin vencerle… y solo una mente rápida puede conseguirlo."
+ },
+ "boss_golem": {
+  "who": "El Cronista",
+  "text": "El Gólem de Cristal se levanta entre destellos. Cada respuesta acertada le abrirá una grieta."
+ },
+ "boss_dragon": {
+  "who": "El Cronista",
+  "text": "Por fin, el Dragón Carmesí. Sus ojos arden como brasas. Es el último desafío: pensad bien cada respuesta."
+ },
+ "final": {
+  "who": "El Cronista",
+  "text": "Lo habéis conseguido. El Dragón Carmesí huye más allá de las montañas, y en lo alto del castillo, la Biblioteca del Saber vuelve a encenderse, ventana a ventana. Esta noche, todo el reino celebra vuestra hazaña. Y recordad siempre: no hay espada más fuerte que una mente despierta."
+ },
+ "nivel": {
+  "who": "El Cronista",
+  "text": "¡Te has hecho más fuerte! Elige en qué quieres mejorar."
+ },
+ "tienda": {
+  "who": "Remigio, el buhonero",
+  "text": "¡Pasad, pasad! Tengo pistas, relojes de arena, dados de todas clases… y una espada que quema solo de mirarla. Vosotros elegís."
+ },
+ "tienda_pobre": {
+  "who": "Remigio, el buhonero",
+  "text": "Uy, sin estrellas no hay trato, amigo. Vuelve cuando tengas alguna más."
+ }
+}
